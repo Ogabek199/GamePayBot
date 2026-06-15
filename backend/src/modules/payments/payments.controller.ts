@@ -9,4 +9,9 @@ export class PaymentsController {
   listMethods() {
     return this.service.listMethods();
   }
+
+  @Get('cards')
+  listCards() {
+    return this.service.listCards();
+  }
 }

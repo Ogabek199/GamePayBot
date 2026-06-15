@@ -1,5 +1,6 @@
-import { Controller, Get, Patch, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Patch, Body, Param, Query, BadRequestException } from '@nestjs/common';
 import { AdminService } from './admin.service';
+import { UpdateDepositStatusDto } from '../deposits/dto/update-deposit.dto';
 
 @Controller('admin')
 export class AdminController {
@@ -18,5 +19,21 @@ export class AdminController {
   @Patch('orders/:id')
   updateOrder(@Param('id') id: string, @Body() body: any) {
     return this.service.updateOrder(id, body);
+  }
+
+  @Get('deposits')
+  listDeposits(@Query('status') status?: string) {
+    return this.service.listDeposits(status);
+  }
+
+  @Patch('deposits/:id')
+  updateDeposit(@Param('id') id: string, @Body() body: UpdateDepositStatusDto) {
+    if (body.status === 'approved') {
+      return this.service.approveDeposit(id);
+    }
+    if (body.status === 'rejected') {
+      return this.service.rejectDeposit(id, body.reason || "To'lov topilmadi");
+    }
+    throw new BadRequestException('Invalid status');
   }
 }

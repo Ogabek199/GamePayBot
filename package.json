@@ -9,6 +9,10 @@
     "prisma": "^5.22.0"
   },
   "dependencies": {
-    "@prisma/client": "^5.22.0"
+    "@nestjs/common": "^11.1.26",
+    "@prisma/client": "^5.22.0",
+    "class-validator": "^0.15.1",
+    "telegraf": "^4.16.3",
+    "zustand": "^5.0.14"
   }
 }
