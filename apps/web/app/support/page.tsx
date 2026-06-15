@@ -8,7 +8,7 @@ export default function SupportPage() {
   const router = useRouter();
 
   return (
-    <main className="min-h-screen animate-fade-in p-5 pb-10 max-w-md mx-auto flex flex-col justify-between">
+    <main className="min-h-screen animate-fade-in p-4 md:p-6 pb-10 max-w-4xl mx-auto flex flex-col justify-between md:ml-20 lg:ml-64">
       {/* Header qismi */}
       <header className="flex items-center justify-between w-full pt-2">
         <button

@@ -43,7 +43,7 @@ export default function HistoryPage() {
   });
 
   return (
-    <main className="min-h-screen animate-fade-in p-5 pb-32 max-w-md mx-auto space-y-6">
+    <main className="min-h-screen animate-fade-in p-4 md:p-6 pb-32 md:pb-8 max-w-4xl mx-auto space-y-6 md:ml-20 lg:ml-64">
       <header className="flex items-center justify-between">
         <BackButton />
         <h1 className="text-lg font-bold">{t('common.history')}</h1>

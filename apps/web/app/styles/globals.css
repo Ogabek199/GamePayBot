@@ -2,9 +2,60 @@
 @tailwind components;
 @tailwind utilities;
 
-:root{
+:root {
   --bg: #020D2B;
 }
 
-html,body,#__next{height:100%;}
-body{background:var(--bg);} 
+html, body, #__next {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+}
+
+/* Glass morphism effect */
+@layer components {
+  .glass {
+    @apply bg-white/10 backdrop-blur-md border border-white/20;
+  }
+
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl;
+  }
+
+  .premium-border {
+    @apply border-white/5;
+  }
+
+  .btn-gold {
+    @apply bg-gold-gradient text-bg font-bold rounded-2xl shadow-gold hover:shadow-[0_6px_20px_rgba(255,196,0,0.5)] transition-all duration-300 active:scale-95;
+  }
+
+  .danger-foreground {
+    @apply text-danger;
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .animate-fade-in {
+    @apply animate-in fade-in duration-500;
+  }
+
+  /* Telegram WebApp optimizations */
+  @supports (padding: max(0px)) {
+    body {
+      padding-left: max(12px, env(safe-area-inset-left));
+      padding-right: max(12px, env(safe-area-inset-right));
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
+      padding-top: max(12px, env(safe-area-inset-top));
+    }
+  }
+} 

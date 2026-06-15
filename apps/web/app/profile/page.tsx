@@ -41,7 +41,7 @@ export default function ProfilePage() {
   ];
 
   return (
-    <main className="min-h-screen animate-fade-in p-5 pb-32 max-w-md mx-auto space-y-8">
+    <main className="min-h-screen animate-fade-in p-4 md:p-6 pb-32 md:pb-8 max-w-4xl mx-auto space-y-8 md:ml-20 lg:ml-64">
       <header className="flex items-center justify-between">
         <BackButton />
         <h1 className="text-lg font-bold">{t('common.profile')}</h1>
@@ -50,11 +50,11 @@ export default function ProfilePage() {
 
       <section className="text-center space-y-4">
         <div className="relative inline-block">
-          <div className="w-24 h-24 rounded-[2rem] border-4 border-primary/20 p-1 overflow-hidden bg-card">
-            {user?.photoUrl ? (
-              <img src={user.photoUrl} alt="Avatar" className="w-full h-full object-cover rounded-[1.5rem]" />
+          <div className="w-24 h-24 md:w-32 md:h-32 rounded-[2rem] border-4 border-primary/20 p-1 overflow-hidden bg-card">
+            {user?.photoUrl && user.photoUrl.trim() ? (
+              <img src={user.photoUrl} alt="Avatar" className="w-full h-full object-cover rounded-[1.5rem]" onError={(e) => { (e.target as any).style.display = 'none'; }} />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-3xl font-bold bg-primary/10 text-primary">
+              <div className="w-full h-full flex items-center justify-center text-3xl md:text-4xl font-bold bg-primary/10 text-primary">
                 {user?.firstName?.charAt(0) || 'U'}
               </div>
             )}
@@ -64,20 +64,20 @@ export default function ProfilePage() {
           </div>
         </div>
         <div>
-          <h2 className="text-xl font-bold">{user?.firstName || 'Foydalanuvchi'}</h2>
-          <p className="text-muted text-xs font-medium">@{user?.username || 'user'} • {t('profile.id')}: {user?.telegramId || '000000'}</p>
+          <h2 className="text-xl md:text-2xl font-bold">{user?.firstName || 'Foydalanuvchi'}</h2>
+          <p className="text-muted text-xs md:text-sm font-medium">@{user?.username || 'user'} • {t('profile.id')}: {user?.telegramId || '000000'}</p>
         </div>
       </section>
 
       {/* Stats Row */}
-      <section className="grid grid-cols-2 gap-4">
-        <div className="glass-card p-4 text-center space-y-1">
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        <div className="glass-card p-4 md:p-6 text-center space-y-1">
           <p className="text-[10px] text-muted font-bold uppercase">{t('common.balance')}</p>
-          <p className="text-lg font-bold">0 {t('common.uzs')}</p>
+          <p className="text-lg md:text-xl font-bold">0 {t('common.uzs')}</p>
         </div>
-        <div className="glass-card p-4 text-center space-y-1">
+        <div className="glass-card p-4 md:p-6 text-center space-y-1">
           <p className="text-[10px] text-muted font-bold uppercase">{t('profile.membership')}</p>
-          <p className="text-lg font-bold text-primary">{t('profile.gold')}</p>
+          <p className="text-lg md:text-xl font-bold text-primary">{t('profile.gold')}</p>
         </div>
       </section>
 
