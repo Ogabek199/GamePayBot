@@ -1,0 +1,176 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(uuid())
+  telegramId    String         @unique
+  username      String?
+  firstName     String?
+  photoUrl      String?
+  role          String         @default("USER")
+  language      String         @default("uz")
+  wallets       Wallet[]
+  orders        Order[]
+  deposits      Deposit[]
+  transactions  Transaction[]
+  notifications Notification[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Wallet {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  balance   Decimal  @default("0")
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId])
+}
+
+model PaymentCard {
+  id          String    @id @default(uuid())
+  cardHolder  String
+  cardNumber  String
+  bankName    String
+  isActive    Boolean   @default(true)
+  deposits    Deposit[]
+  createdAt   DateTime  @default(now())
+}
+
+model Deposit {
+  id         String      @id @default(uuid())
+  user       User        @relation(fields: [userId], references: [id])
+  userId     String
+  card       PaymentCard @relation(fields: [cardId], references: [id])
+  cardId     String
+  amount     Decimal
+  status     String      @default("pending") // pending, approved, rejected
+  adminNote  String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model Transaction {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  type      String   // deposit, order, refund
+  amount    Decimal
+  status    String   // success, failed, pending
+  createdAt DateTime @default(now())
+}
+
+model Game {
+  id        String    @id @default(uuid())
+  name      String
+  slug      String    @unique
+  logo      String?
+  banner    String?
+  status    String    @default("active")
+  packages  Package[]
+  orders    Order[]
+  createdAt DateTime  @default(now())
+}
+
+model Package {
+  id        String   @id @default(uuid())
+  game      Game     @relation(fields: [gameId], references: [id])
+  gameId    String
+  title     String
+  amount    Int
+  price     Decimal
+  image     String?
+  status    String   @default("active")
+  orders    Order[]
+  createdAt DateTime @default(now())
+}
+
+model Order {
+  id              String   @id @default(uuid())
+  user            User     @relation(fields: [userId], references: [id])
+  userId          String
+  game            Game     @relation(fields: [gameId], references: [id])
+  gameId          String
+  package         Package  @relation(fields: [packageId], references: [id])
+  packageId       String
+  uid             String?
+  region          String?
+  price           Decimal
+  currency        String
+  status          String   @default("pending") // pending, waiting_payment, checking, paid, processing, completed, cancelled, failed
+  paymentMethodId String?
+  meta            String?
+  adminNote       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model PaymentMethod {
+  id      String  @id @default(uuid())
+  name    String
+  type    String  // MANUAL_CARD, CLICK, PAYME, UZUM, CRYPTO
+  details String?
+  active  Boolean @default(true)
+}
+
+model Banner {
+  id        String   @id @default(uuid())
+  image     String
+  link      String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model PromoCode {
+  id        String    @id @default(uuid())
+  code      String    @unique
+  amount    Decimal
+  currency  String
+  active    Boolean   @default(true)
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model Admin {
+  id        String     @id @default(uuid())
+  username  String     @unique
+  password  String
+  role      String     @default("ADMIN") // ADMIN, SUPER_ADMIN
+  logs      AdminLog[]
+  createdAt DateTime   @default(now())
+}
+
+model AdminLog {
+  id        String   @id @default(uuid())
+  admin     Admin    @relation(fields: [adminId], references: [id])
+  adminId   String
+  action    String
+  target    String?
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model SupportTicket {
+  id        String   @id @default(uuid())
+  userId    String
+  subject   String
+  message   String
+  status    String   @default("open")
+  createdAt DateTime @default(now())
+}

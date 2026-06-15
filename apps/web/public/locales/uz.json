@@ -1,0 +1,48 @@
+{
+  "common": {
+    "welcome": "Xush kelibsiz",
+    "balance": "Balans",
+    "topup": "To'ldirish",
+    "withdraw": "Yechib olish",
+    "history": "Tarix",
+    "profile": "Profil",
+    "home": "Bosh sahifa",
+    "wallet": "Hamyon",
+    "support": "Yordam",
+    "logout": "Chiqish",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "back": "Ortga",
+    "next": "Davom etish",
+    "uzs": "UZS"
+  },
+  "home": {
+    "popular_games": "Mashhur o'yinlar",
+    "see_all": "Hammasi",
+    "fast_payment": "Tezkor to'lov",
+    "auto_system": "Avtomatik tizim",
+    "support_247": "24/7 Qo'llab",
+    "always_online": "Doimiy aloqa"
+  },
+  "profile": {
+    "personal_info": "Shaxsiy ma'lumotlar",
+    "payment_methods": "To'lov usullari",
+    "security": "Xavfsizlik",
+    "language": "Til",
+    "select_language": "Tilni tanlang",
+    "logout_confirm": "Tizimdan chiqishni xohlaysizmi?",
+    "id": "ID",
+    "membership": "A'zolik",
+    "gold": "Gold Member"
+  },
+  "wallet": {
+    "total_balance": "Umumiy balans",
+    "quick_actions": "Tezkor amallar",
+    "promo": "Promo",
+    "cards": "Kartalar",
+    "recent_txs": "Oxirgi tranzaksiyalar",
+    "enter_amount": "Summani kiriting",
+    "select_method": "To'lov usulini tanlang",
+    "pay_confirm": "Men to'ladim"
+  }
+}

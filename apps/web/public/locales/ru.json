@@ -1,0 +1,48 @@
+{
+  "common": {
+    "welcome": "Добро пожаловать",
+    "balance": "Баланс",
+    "topup": "Пополнить",
+    "withdraw": "Вывести",
+    "history": "История",
+    "profile": "Профиль",
+    "home": "Главная",
+    "wallet": "Кошелек",
+    "support": "Поддержка",
+    "logout": "Выйти",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "back": "Назад",
+    "next": "Далее",
+    "uzs": "сум"
+  },
+  "home": {
+    "popular_games": "Популярные игры",
+    "see_all": "Все",
+    "fast_payment": "Быстрая оплата",
+    "auto_system": "Автоматика",
+    "support_247": "24/7 Поддержка",
+    "always_online": "Всегда на связи"
+  },
+  "profile": {
+    "personal_info": "Личные данные",
+    "payment_methods": "Способы оплаты",
+    "security": "Безопасность",
+    "language": "Язык",
+    "select_language": "Выберите язык",
+    "logout_confirm": "Вы уверены, что хотите выйти?",
+    "id": "ID",
+    "membership": "Членство",
+    "gold": "Gold Member"
+  },
+  "wallet": {
+    "total_balance": "Общий баланс",
+    "quick_actions": "Быстрые действия",
+    "promo": "Промо",
+    "cards": "Карты",
+    "recent_txs": "Последние транзакции",
+    "enter_amount": "Введите сумму",
+    "select_method": "Выберите способ",
+    "pay_confirm": "Я оплатил"
+  }
+}

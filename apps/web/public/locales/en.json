@@ -1,0 +1,48 @@
+{
+  "common": {
+    "welcome": "Welcome",
+    "balance": "Balance",
+    "topup": "Top Up",
+    "withdraw": "Withdraw",
+    "history": "History",
+    "profile": "Profile",
+    "home": "Home",
+    "wallet": "Wallet",
+    "support": "Support",
+    "logout": "Logout",
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back",
+    "next": "Next",
+    "uzs": "UZS"
+  },
+  "home": {
+    "popular_games": "Popular Games",
+    "see_all": "See All",
+    "fast_payment": "Fast Payment",
+    "auto_system": "Auto System",
+    "support_247": "24/7 Support",
+    "always_online": "Always Online"
+  },
+  "profile": {
+    "personal_info": "Personal Info",
+    "payment_methods": "Payment Methods",
+    "security": "Security",
+    "language": "Language",
+    "select_language": "Select Language",
+    "logout_confirm": "Are you sure you want to logout?",
+    "id": "ID",
+    "membership": "Membership",
+    "gold": "Gold Member"
+  },
+  "wallet": {
+    "total_balance": "Total Balance",
+    "quick_actions": "Quick Actions",
+    "promo": "Promo",
+    "cards": "Cards",
+    "recent_txs": "Recent Transactions",
+    "enter_amount": "Enter Amount",
+    "select_method": "Select Method",
+    "pay_confirm": "I've Paid"
+  }
+}
