@@ -5,7 +5,10 @@ import { PrismaService } from '../../common/prisma.service';
 export class TransactionsService {
   constructor(private prisma: PrismaService) {}
 
-  async findByWallet(walletId: string) {
-    return this.prisma.transaction.findMany({ where: { walletId }, orderBy: { createdAt: 'desc' } });
+  findByUser(userId: string) {
+    return this.prisma.transaction.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+    });
   }
 }
