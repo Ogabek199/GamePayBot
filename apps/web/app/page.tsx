@@ -28,16 +28,16 @@ export default function Home() {
   if (!mounted) return null;
 
   return (
-    <main className="min-h-screen animate-fade-in p-5 pb-32 space-y-8 max-w-md mx-auto">
+    <main className="min-h-screen animate-fade-in p-4 md:p-6 pb-32 md:pb-8 space-y-8 w-full max-w-4xl mx-auto md:ml-20 lg:ml-64">
       {/* User Welcome Card */}
       <section className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <div className="relative">
-            <div className="w-14 h-14 rounded-full border-2 border-primary/50 overflow-hidden bg-card">
-              {user?.photoUrl ? (
-                <img src={user.photoUrl} alt="User" className="w-full h-full object-cover" />
+        <div className="flex items-center space-x-3 flex-1">
+          <div className="relative flex-shrink-0">
+            <div className="w-14 h-14 md:w-16 md:h-16 rounded-full border-2 border-primary/50 overflow-hidden bg-card">
+              {user?.photoUrl && user.photoUrl.trim() ? (
+                <img src={user.photoUrl} alt="User" className="w-full h-full object-cover" onError={(e) => { (e.target as any).style.display = 'none'; }} />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-xl font-bold bg-primary/10 text-primary">
+                <div className="w-full h-full flex items-center justify-center text-xl md:text-2xl font-bold bg-primary/10 text-primary">
                   {user?.firstName?.charAt(0) || 'U'}
                 </div>
               )}
@@ -46,51 +46,51 @@ export default function Home() {
               <Crown size={12} fill="currentColor" />
             </div>
           </div>
-          <div>
+          <div className="flex-1 min-w-0">
             <div className="flex items-center space-x-1">
               <span className="text-muted text-xs">{t('common.welcome')}</span>
             </div>
-            <h2 className="text-lg font-bold leading-tight">
+            <h2 className="text-lg md:text-xl font-bold leading-tight truncate">
               {user?.firstName || 'Foydalanuvchi'}
             </h2>
           </div>
         </div>
-        <button className="w-10 h-10 rounded-full glass flex items-center justify-center text-muted hover:text-white transition-colors">
+        <button className="w-10 h-10 rounded-full glass flex items-center justify-center text-muted hover:text-white transition-colors flex-shrink-0">
           <ChevronRight size={20} />
         </button>
       </section>
 
       {/* Balance Card */}
       <section className="relative group">
-        <div className="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-[2rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
-        <div className="relative bg-premium-card rounded-[2rem] p-7 border border-white/5 overflow-hidden shadow-premium">
+        <div className="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-[2rem] md:rounded-[3rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+        <div className="relative bg-premium-card rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 border border-white/5 overflow-hidden shadow-premium">
           {/* Background Decorative Circles */}
           <div className="absolute top-[-20%] right-[-10%] w-32 h-32 bg-primary/20 rounded-full blur-3xl"></div>
           <div className="absolute bottom-[-20%] left-[-10%] w-24 h-24 bg-secondary/10 rounded-full blur-2xl"></div>
 
-          <div className="flex justify-between items-start relative z-10">
-            <div className="space-y-1">
+          <div className="flex flex-col md:flex-row justify-between items-start relative z-10 gap-4">
+            <div className="space-y-1 flex-1">
               <p className="text-muted text-xs font-medium uppercase tracking-wider">{t('wallet.total_balance')}</p>
-              <div className="flex items-baseline space-x-1">
-                <h3 className="text-4xl font-extrabold tracking-tight">0</h3>
-                <span className="text-primary font-bold">{t('common.uzs')}</span>
+              <div className="flex items-baseline space-x-1 flex-wrap">
+                <h3 className="text-4xl md:text-5xl font-extrabold tracking-tight">0</h3>
+                <span className="text-primary font-bold text-lg">{t('common.uzs')}</span>
               </div>
             </div>
-            <div className="bg-white/5 px-3 py-1.5 rounded-full border border-white/10 backdrop-blur-md">
+            <div className="bg-white/5 px-3 py-1.5 rounded-full border border-white/10 backdrop-blur-md flex-shrink-0">
               <span className="text-[10px] font-bold text-primary flex items-center space-x-1">
                 <Crown size={10} className="mr-1" /> {t('profile.gold').toUpperCase()}
               </span>
             </div>
           </div>
 
-          <div className="mt-10 flex items-center justify-between relative z-10">
-            <div className="space-y-0.5">
+          <div className="mt-8 md:mt-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
+            <div className="space-y-0.5 flex-1">
               <p className="text-[10px] text-muted font-bold uppercase">{t('common.balance')} {t('common.topup').toLowerCase()}</p>
-              <p className="text-sm font-semibold">+ 0 {t('common.uzs')} bugun</p>
+              <p className="text-sm md:text-base font-semibold">+ 0 {t('common.uzs')} bugun</p>
             </div>
             <Link 
               href="/wallet/deposit"
-              className="btn-gold h-12 w-12 !p-0 !rounded-2xl"
+              className="btn-gold h-12 w-12 md:h-14 md:w-14 !p-0 !rounded-2xl flex-shrink-0"
             >
               <Plus size={24} strokeWidth={3} />
             </Link>
@@ -111,13 +111,32 @@ export default function Home() {
       {/* Popular Games Section */}
       <section className="space-y-4">
         <div className="flex items-center justify-between px-1">
-          <h3 className="text-lg font-bold">{t('home.popular_games')}</h3>
-          <button className="text-xs font-bold text-primary flex items-center">
+          <h3 className="text-lg md:text-2xl font-bold">{t('home.popular_games')}</h3>
+          <button className="text-xs md:text-sm font-bold text-primary flex items-center hover:text-primary/80 transition-colors">
             {t('home.see_all')} <ChevronRight size={14} className="ml-1" />
           </button>
         </div>
         
-        <div className="flex space-x-4 overflow-x-auto pb-4 px-1 hide-scrollbar -mx-5 px-5">
+        <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {popularGames.map((game) => (
+            <motion.div 
+              key={game.id}
+              whileTap={{ scale: 0.95 }}
+              className="group"
+            >
+              <Link href={`/games/${game.slug}`} className="block">
+                <div className="w-full aspect-square rounded-2xl overflow-hidden bg-card border border-border shadow-lg group-hover:border-primary/50 transition-all duration-300">
+                  <img src={game.image} alt={game.name} className="w-full h-full object-cover p-2" onError={(e) => { (e.target as any).style.display = 'none'; }} />
+                </div>
+                <p className="text-[11px] font-bold text-center mt-2 group-hover:text-primary transition-colors line-clamp-1">
+                  {game.name}
+                </p>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+        
+        <div className="flex md:hidden space-x-4 overflow-x-auto pb-4 px-1 hide-scrollbar -mx-4 px-4">
           {popularGames.map((game) => (
             <motion.div 
               key={game.id}
@@ -126,7 +145,7 @@ export default function Home() {
             >
               <Link href={`/games/${game.slug}`} className="block group">
                 <div className="w-24 h-24 rounded-2xl overflow-hidden bg-card border border-border shadow-lg group-hover:border-primary/50 transition-all duration-300">
-                  <img src={game.image} alt={game.name} className="w-full h-full object-cover p-2" />
+                  <img src={game.image} alt={game.name} className="w-full h-full object-cover p-2" onError={(e) => { (e.target as any).style.display = 'none'; }} />
                 </div>
                 <p className="text-[11px] font-bold text-center mt-2 group-hover:text-primary transition-colors line-clamp-1">
                   {game.name}
@@ -138,23 +157,23 @@ export default function Home() {
       </section>
 
       {/* Categories / Services (Extra) */}
-      <section className="grid grid-cols-2 gap-4">
-        <div className="glass-card p-4 space-y-3">
-          <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center text-success">
+      <section className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+        <div className="glass-card p-4 md:p-6 space-y-3 h-full">
+          <div className="w-10 h-10 rounded-xl bg-success/10 flex items-center justify-center text-success flex-shrink-0">
             <Wallet size={20} />
           </div>
           <div>
-            <h4 className="font-bold text-sm text-muted">{t('home.fast_payment')}</h4>
-            <p className="text-xs">{t('home.auto_system')}</p>
+            <h4 className="font-bold text-sm md:text-base text-muted line-clamp-2">{t('home.fast_payment')}</h4>
+            <p className="text-xs text-muted/70 line-clamp-2">{t('home.auto_system')}</p>
           </div>
         </div>
-        <div className="glass-card p-4 space-y-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+        <div className="glass-card p-4 md:p-6 space-y-3 h-full">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
             <Clock size={20} />
           </div>
           <div>
-            <h4 className="font-bold text-sm text-muted">{t('home.support_247')}</h4>
-            <p className="text-xs">{t('home.always_online')}</p>
+            <h4 className="font-bold text-sm md:text-base text-muted line-clamp-2">{t('home.support_247')}</h4>
+            <p className="text-xs text-muted/70 line-clamp-2">{t('home.always_online')}</p>
           </div>
         </div>
       </section>

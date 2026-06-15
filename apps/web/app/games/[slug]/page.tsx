@@ -31,7 +31,7 @@ export default function GameDetail() {
   };
 
   return (
-    <main className="min-h-screen animate-fade-in p-5 pb-32 max-w-md mx-auto space-y-8">
+    <main className="min-h-screen animate-fade-in p-4 md:p-6 pb-32 md:pb-8 max-w-4xl mx-auto space-y-8 md:ml-20 lg:ml-64">
       {/* Header */}
       <header className="flex items-center justify-between">
         <button onClick={() => router.back()} className="w-10 h-10 rounded-full glass flex items-center justify-center text-muted">
@@ -70,18 +70,18 @@ export default function GameDetail() {
             <input 
               type="text" 
               placeholder="UID kiriting" 
-              className="w-full h-14 bg-card rounded-2xl px-6 border border-border focus:border-primary/50 outline-none transition-all font-bold tracking-wider"
+              className="w-full h-12 md:h-14 bg-card rounded-2xl px-6 border border-border focus:border-primary/50 outline-none transition-all font-bold tracking-wider text-base"
               value={uid}
               onChange={(e) => setUid(e.target.value)}
             />
-            <Info size={18} className="absolute right-4 top-4 text-muted/50" />
+            <Info size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted/50" />
           </div>
         </div>
 
         <div className="space-y-2">
           <label className="text-xs font-bold text-muted uppercase ml-2">Region</label>
           <select 
-            className="w-full h-14 bg-card rounded-2xl px-6 border border-border focus:border-primary/50 outline-none transition-all font-bold appearance-none cursor-pointer"
+            className="w-full h-12 md:h-14 bg-card rounded-2xl px-6 border border-border focus:border-primary/50 outline-none transition-all font-bold appearance-none cursor-pointer text-base"
             value={region}
             onChange={(e) => setRegion(e.target.value)}
           >
@@ -94,8 +94,8 @@ export default function GameDetail() {
 
       {/* Packages Grid */}
       <section className="space-y-4">
-        <h3 className="text-lg font-bold px-1">Paketni tanlang</h3>
-        <div className="grid grid-cols-2 gap-4">
+        <h3 className="text-lg md:text-xl font-bold px-1">Paketni tanlang</h3>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
           {packages.map((pkg) => (
             <motion.div
               key={pkg.id}
@@ -127,12 +127,12 @@ export default function GameDetail() {
       </section>
 
       {/* Purchase Button Footer */}
-      <div className="fixed bottom-28 left-0 right-0 px-6 z-40 pointer-events-none">
-        <div className="max-w-md mx-auto pointer-events-auto">
+      <div className="fixed bottom-32 md:bottom-8 left-0 right-0 px-4 md:px-6 z-40 pointer-events-none md:ml-20 lg:ml-64">
+        <div className="max-w-2xl mx-auto pointer-events-auto">
           <button
             onClick={handlePurchase}
             disabled={!selectedPkg || !uid}
-            className={`w-full h-16 rounded-[2rem] font-bold text-lg flex items-center justify-center space-x-3 shadow-premium transition-all duration-300 ${
+            className={`w-full h-14 md:h-16 rounded-[2rem] font-bold text-lg flex items-center justify-center space-x-3 shadow-premium transition-all duration-300 ${
               selectedPkg && uid 
               ? 'bg-gold-gradient text-bg shadow-gold scale-100' 
               : 'bg-card text-muted opacity-50 cursor-not-allowed scale-95'

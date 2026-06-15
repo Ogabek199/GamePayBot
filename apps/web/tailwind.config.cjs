@@ -30,7 +30,17 @@ module.exports = {
         'xl': '1rem',
         '2xl': '1.5rem',
         '3xl': '2rem',
-      }
+      },
+      animation: {
+        'fade-in': 'fadeIn 0.5s ease-in-out',
+        'in': 'fadeIn 0.3s ease-in-out',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+      },
     },
   },
   plugins: [],

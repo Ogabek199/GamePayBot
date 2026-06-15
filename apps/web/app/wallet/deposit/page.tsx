@@ -25,7 +25,7 @@ export default function DepositPage() {
   };
 
   return (
-    <main className="min-h-screen animate-fade-in p-5 pb-32 max-w-md mx-auto space-y-8">
+    <main className="min-h-screen animate-fade-in p-4 md:p-6 pb-32 md:pb-8 max-w-4xl mx-auto space-y-8 md:ml-20 lg:ml-64">
       <header className="flex items-center justify-between">
         <button 
           onClick={() => step === 1 ? router.back() : setStep(1)} 
@@ -45,16 +45,16 @@ export default function DepositPage() {
 
       {step === 1 ? (
         <section className="space-y-8">
-          <div className="bg-card rounded-[2.5rem] p-8 border border-border shadow-premium relative overflow-hidden">
+          <div className="bg-card rounded-[2.5rem] md:rounded-[3rem] p-6 md:p-8 border border-border shadow-premium relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl"></div>
             <p className="text-center text-muted text-[10px] font-bold uppercase tracking-widest mb-6">To'lov summasini kiriting</p>
-            <div className="flex flex-col items-center">
-              <div className="flex items-center space-x-2">
+            <div className="flex flex-col items-center gap-2">
+              <div className="flex items-center space-x-2 justify-center flex-wrap">
                 <input 
                   type="number" 
                   placeholder="0"
                   min="0"
-                  className="bg-transparent text-center text-5xl font-black outline-none placeholder:text-white/5 w-full"
+                  className="bg-transparent text-center text-4xl md:text-5xl font-black outline-none placeholder:text-white/5"
                   value={amount}
                   onChange={(e) => {
                     const val = e.target.value;
@@ -63,14 +63,14 @@ export default function DepositPage() {
                   }}
                   autoFocus
                 />
-                <span className="text-primary text-xl font-bold mt-2">UZS</span>
+                <span className="text-primary text-xl md:text-2xl font-bold">UZS</span>
               </div>
-              <div className="grid grid-cols-2 gap-3 mt-8 w-full">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mt-8 w-full">
                 {['50000', '100000', '200000', '500000'].map((val) => (
                   <button 
                     key={val}
                     onClick={() => setAmount(val)}
-                    className="h-12 rounded-2xl glass text-xs font-bold border-white/5 active:scale-95 transition-all"
+                    className="h-10 md:h-12 rounded-2xl glass text-xs font-bold border-white/5 active:scale-95 transition-all"
                   >
                     +{Number(val).toLocaleString()} UZS
                   </button>
@@ -119,12 +119,12 @@ export default function DepositPage() {
       )}
 
       {/* Action Button */}
-      <div className="fixed bottom-28 left-0 right-0 px-6 z-40 pointer-events-none">
-        <div className="max-w-md mx-auto pointer-events-auto">
+      <div className="fixed bottom-32 md:bottom-8 left-0 right-0 px-4 md:px-6 z-40 pointer-events-none md:ml-20 lg:ml-64">
+        <div className="max-w-2xl mx-auto pointer-events-auto">
           <button
             onClick={handleNext}
             disabled={step === 1 ? !amount : !selectedMethod}
-            className={`w-full h-16 rounded-[2rem] font-bold text-lg shadow-premium transition-all duration-300 ${
+            className={`w-full h-14 md:h-16 rounded-[2rem] font-bold text-lg shadow-premium transition-all duration-300 ${
               (step === 1 ? amount : selectedMethod) 
               ? 'bg-gold-gradient text-bg shadow-gold scale-100' 
               : 'bg-card text-muted opacity-50 cursor-not-allowed scale-95'
