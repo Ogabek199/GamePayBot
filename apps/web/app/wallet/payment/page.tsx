@@ -143,28 +143,29 @@ function PaymentContent() {
       </header>
 
       {/* Timer Section */}
-      <section className="flex flex-col items-center justify-center space-y-2 py-2">
-        <div className={`flex items-center space-x-2 px-4 py-2 rounded-full glass border-white/10 ${timeLeft < 60 ? 'text-danger animate-pulse' : 'text-primary'}`}>
-          <Clock size={18} />
-          <span className="font-mono text-xl font-bold">{formatTime(timeLeft)}</span>
+      <section className="flex flex-col items-center justify-center space-y-3 py-4 md:py-6">
+        <p className="text-xs text-muted font-bold uppercase tracking-widest">Vaqti qolgan</p>
+        <div className={`flex items-center space-x-3 px-6 py-3 rounded-full glass border-white/10 transition-all ${timeLeft < 60 ? 'text-danger animate-pulse shadow-[0_0_16px_rgba(255,71,87,0.3)]' : 'text-primary'}`}>
+          <Clock size={20} />
+          <span className="font-mono text-2xl md:text-3xl font-black tracking-wider">{formatTime(timeLeft)}</span>
         </div>
       </section>
 
       {/* Amount Card */}
-      <section className="bg-premium-card rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 border border-white/5 shadow-premium text-center space-y-3 relative overflow-hidden">
+      <section className="bg-premium-card rounded-2xl md:rounded-[2.5rem] p-5 md:p-8 border border-white/5 shadow-premium text-center space-y-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-primary/5 opacity-50"></div>
-        <div className="relative z-10">
+        <div className="relative z-10 space-y-4">
           <p className="text-muted text-[10px] font-bold uppercase tracking-widest">To'lov summasi</p>
-          <div className="flex items-center justify-center space-x-2 flex-wrap">
-            <h2 className="text-4xl md:text-5xl font-black">{Number(amount).toLocaleString()}</h2>
-            <span className="text-primary font-bold text-lg md:text-2xl">UZS</span>
+          <div className="flex items-center justify-center space-x-1 md:space-x-3 flex-wrap gap-1">
+            <h2 className="text-3xl md:text-5xl font-black leading-none">{Number(amount).toLocaleString()}</h2>
+            <span className="text-primary font-bold text-base md:text-2xl">UZS</span>
           </div>
           <button 
             onClick={() => copyToClipboard(amount, 'Summa')}
-            className="mt-4 flex items-center space-x-2 mx-auto text-[10px] font-bold text-primary/80 hover:text-primary transition-colors bg-white/5 px-3 py-1 rounded-full border border-white/5"
+            className="mt-3 flex items-center space-x-2 mx-auto text-[10px] font-bold text-primary/80 hover:text-primary transition-colors bg-white/5 hover:bg-white/10 px-4 py-2 rounded-full border border-white/5 hover:border-primary/30"
           >
-            <Copy size={12} />
-            <span>SUMMANI NUSXALASH</span>
+            <Copy size={14} />
+            <span>NUSXALASH</span>
           </button>
         </div>
       </section>
