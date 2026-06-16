@@ -1,4 +1,4 @@
-import { Controller, Get, InternalServerErrorException } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 
 @Controller('api/v1/payments')
@@ -13,11 +13,13 @@ export class PaymentsController {
   @Get('cards')
   async listCards() {
     try {
-      return await this.service.listCards();
+      const cards = await this.service.listCards();
+      return cards ?? [];
     } catch (err: any) {
       // eslint-disable-next-line no-console
       console.error('PaymentsController.listCards error:', err?.message || err);
-      throw new InternalServerErrorException("Karta ma'lumotlarini yuklashda xatolik yuz berdi");
+      // Bo'sh array qaytarish — frontend xatolik ko'rmasin
+      return [];
     }
   }
 }

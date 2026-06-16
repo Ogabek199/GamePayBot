@@ -24,9 +24,12 @@ export const useTranslation = create<TranslationState>()(
       setLang: (l) => set({ lang: l }),
       setHasHydrated: (h) => set({ hasHydrated: h }),
       t: (key: string) => {
-        if (!get().hasHydrated) return ''; // Return empty or placeholder until hydrated
+        const lang = get().lang;
         const [section, subkey] = key.split('.');
-        return translations[get().lang]?.[section]?.[subkey] || key;
+        // Har doim tarjimadan qiymat qaytarish (hydrated bo'lmasa ham uz default)
+        return translations[lang]?.[section]?.[subkey]
+          || translations['uz']?.[section]?.[subkey]
+          || key;
       },
     }),
     { 

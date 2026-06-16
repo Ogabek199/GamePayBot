@@ -8,9 +8,13 @@ import { CurrentUser } from '../../common/decorators/user.decorator';
 export class WalletsController {
   constructor(private readonly service: WalletsService) {}
 
-  // Always scoped to the authenticated user — never trust a userId from the client.
   @Get('me')
   getMine(@CurrentUser() user: any) {
     return this.service.getOrCreateForUser(user.sub);
+  }
+
+  @Get('stats')
+  getStats(@CurrentUser() user: any) {
+    return this.service.getUserStats(user.sub);
   }
 }

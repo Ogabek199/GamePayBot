@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsUUID, IsNumber, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsUUID, IsOptional } from 'class-validator';
 
 export class CreateOrderDto {
   @IsUUID()
@@ -6,16 +6,9 @@ export class CreateOrderDto {
 
   @IsString()
   @IsNotEmpty()
-  uid: string; // game user id
+  uid: string;
 
   @IsString()
   @IsOptional()
   region?: string;
-
-  @IsNumber()
-  price: number;
-
-  @IsString()
-  @IsOptional()
-  currency?: string;
 }

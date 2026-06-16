@@ -6,8 +6,18 @@ export class GamesController {
   constructor(private readonly service: GamesService) {}
 
   @Get()
-  findAll() {
-    return this.service.findAll();
+  async findAll() {
+    try {
+      return await this.service.findAll();
+    } catch (err: any) {
+      console.error('GamesController.findAll error:', err?.message || err);
+      return [];
+    }
+  }
+
+  @Get('slug/:slug')
+  findBySlug(@Param('slug') slug: string) {
+    return this.service.findBySlug(slug);
   }
 
   @Get(':id')

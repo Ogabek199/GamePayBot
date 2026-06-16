@@ -26,7 +26,7 @@ export default function RootLayout({children}: { children: React.ReactNode }) {
   return (
       <html lang="uz">
       <body className="bg-bg text-white min-h-dvh overflow-x-hidden" suppressHydrationWarning>
-      <Toaster position="top-center" reverseOrder={false}/>
+      <Toaster position="top-center" reverseOrder={false} containerStyle={{ zIndex: 9999999 }}/>
       <div className="flex min-h-screen">
         <TelegramAuth/>
         <BottomNav/>

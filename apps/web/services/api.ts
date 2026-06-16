@@ -7,7 +7,6 @@ const api = axios.create({
   timeout: 10000,
 });
 
-// Request: JWT token qo'shish
 api.interceptors.request.use((cfg) => {
   const token = useAuthStore.getState().token;
   if (token) {
@@ -16,12 +15,10 @@ api.interceptors.request.use((cfg) => {
   return cfg;
 });
 
-// Response: 401 bo'lsa logout
 api.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err.response?.status === 401) {
-      // Token eskirgan — store ni tozalaymiz
       useAuthStore.getState().logout();
     }
     return Promise.reject(err);
@@ -38,6 +35,7 @@ export async function loginWithTelegram(initData: string) {
 
 export async function updateProfile(data: { firstName: string }) {
   const resp = await api.patch('/auth/profile', data);
+  useAuthStore.getState().updateUser({ firstName: data.firstName });
   return resp.data;
 }
 
@@ -48,10 +46,36 @@ export async function fetchMyWallet() {
   return resp.data;
 }
 
+export async function fetchWalletStats() {
+  const resp = await api.get('/wallet/stats');
+  return resp.data as {
+    balance: number;
+    todayPayments: number;
+    pendingDeposits: number;
+  };
+}
+
+// ── Games ───────────────────────────────────────────────────────────────────────
+
+export async function fetchGames() {
+  const resp = await api.get('/games');
+  return resp.data;
+}
+
+export async function fetchGameBySlug(slug: string) {
+  const resp = await api.get(`/games/slug/${slug}`);
+  return resp.data;
+}
+
 // ── Orders ────────────────────────────────────────────────────────────────────
 
 export async function fetchOrders() {
   const resp = await api.get('/orders');
+  return resp.data;
+}
+
+export async function createOrder(packageId: string, uid: string, region?: string) {
+  const resp = await api.post('/orders', { packageId, uid, region });
   return resp.data;
 }
 
@@ -81,13 +105,9 @@ export async function fetchMyTransactions() {
   return resp.data;
 }
 
-// ── Logout ────────────────────────────────────────────────────────────────────
-
 export function logout() {
   useAuthStore.getState().logout();
 }
-
-// ── Debug ─────────────────────────────────────────────────────────────────────
 
 export async function pingBackend() {
   try {

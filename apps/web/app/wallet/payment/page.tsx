@@ -75,7 +75,7 @@ function PaymentContent() {
     
     // Check if token exists in session storage directly as a fallback
     if (!currentToken) {
-        const storedAuth = sessionStorage.getItem('gp_auth_storage');
+        const storedAuth = localStorage.getItem('gp_auth_storage');
         if (storedAuth) {
             currentToken = JSON.parse(storedAuth).state.token;
         }

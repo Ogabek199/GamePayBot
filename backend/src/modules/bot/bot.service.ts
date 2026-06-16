@@ -1,6 +1,8 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Telegraf } from 'telegraf';
+import { Telegraf, Input } from 'telegraf';
+import * as fs from 'fs';
+import * as path from 'path';
 import { AuthService } from '../auth/auth.service';
 
 type DepositAction = 'approve' | 'reject';
@@ -9,10 +11,17 @@ type DepositActionHandler = (
   depositId: string,
 ) => Promise<string>;
 
+type OrderAction = 'approve' | 'reject';
+type OrderActionHandler = (
+  action: OrderAction,
+  orderId: string,
+) => Promise<string>;
+
 @Injectable()
 export class BotService implements OnModuleInit, OnModuleDestroy {
   private bot: Telegraf | null = null;
   private depositActionHandler: DepositActionHandler | null = null;
+  private orderActionHandler: OrderActionHandler | null = null;
 
   constructor(
     private configService: ConfigService,
@@ -23,6 +32,10 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
 
   registerDepositActionHandler(handler: DepositActionHandler) {
     this.depositActionHandler = handler;
+  }
+
+  registerOrderActionHandler(handler: OrderActionHandler) {
+    this.orderActionHandler = handler;
   }
 
   // ─── Lifecycle ───────────────────────────────────────────────────────────────
@@ -135,6 +148,42 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
+  async notifyAdminOrder(order: any) {
+    const adminChatId = this.configService.get<string>('ADMIN_CHAT_ID');
+
+    if (!this.bot || !adminChatId || isNaN(parseInt(adminChatId, 10))) {
+      return;
+    }
+
+    const user = order.user ?? {};
+    const game = order.game ?? {};
+    const pkg = order.package ?? {};
+    const amount = Number(order.price).toLocaleString('ru-RU');
+    
+    const message =
+      `🎮 Yangi Buyurtma\n\n` +
+      `Buyurtma ID: #${order.id}\n` +
+      `User: @${user.username ?? 'user'}\n` +
+      `User ID: ${user.telegramId ?? '-'}\n` +
+      `O'yin: ${game.name ?? '-'}\n` +
+      `Paket: ${pkg.title ?? '-'}\n` +
+      `UID/ID: ${order.uid}\n` +
+      `Region: ${order.region ?? '-'}\n` +
+      `Narxi: ${amount} UZS\n` +
+      `Holati: Kutilmoqda`;
+
+    await this.bot.telegram.sendMessage(adminChatId, message, {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: '✅ Tasdiqlash', callback_data: `approve_order:${order.id}` },
+            { text: '❌ Bekor qilish',  callback_data: `reject_order:${order.id}` },
+          ],
+        ],
+      },
+    });
+  }
+
   async notifyUser(telegramId: string, text: string) {
     if (!this.bot || !telegramId) return;
     try {
@@ -184,23 +233,32 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
         // Do NOT return — still show the button even if DB failed
       }
 
-      // 3. Reply with WebApp button (always inline_keyboard, never plain URL)
       const greeting =
-        `Xush kelibsiz, ${ctx.from.first_name ?? 'foydalanuvchi'}! 🎮\n\n` +
-        `GamePayBot orqali o'yinlar uchun paketlarni tez va arzon sotib oling.`;
+        `Assalomu alaykum!\n\n` +
+        `⚡️ GamePayBot — O'yinlarga donat qilishda sizga yordam beradigan platforma.\n\n` +
+        `Xizmatlarimizdan foydalanish uchun « 🛒 Haridni boshlash » tugmasiga bosing 👇`;
+
+      const keyboard = {
+        inline_keyboard: [
+          [{ text: '🛒 Haridni boshlash', web_app: { url: webAppUrl } }],
+          [{ text: "📖 Qo'llanma", callback_data: 'guide' }],
+          [{ text: "📣 So'ngi yangiliklar", url: 'https://t.me/Yoldashaliyev_19' }],
+        ],
+      };
 
       try {
-        await ctx.reply(greeting, {
-          reply_markup: {
-            inline_keyboard: [
-              [{ text: "🛍 Do'konni ochish", web_app: { url: webAppUrl } }],
-            ],
-          },
-        });
+        const imagePath = this.getStartImagePath();
+        if (imagePath && fs.existsSync(imagePath)) {
+          await ctx.replyWithPhoto(Input.fromLocalFile(imagePath), {
+            caption: greeting,
+            reply_markup: keyboard,
+          });
+        } else {
+          await ctx.reply(greeting, { reply_markup: keyboard });
+        }
       } catch (replyErr: any) {
         console.error('[Bot] Reply with markup failed:', replyErr?.message);
-        // Last-resort fallback (should not normally happen)
-        await ctx.reply(greeting).catch(() => {});
+        await ctx.reply(greeting, { reply_markup: keyboard }).catch(() => {});
       }
     });
 
@@ -256,12 +314,32 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
         .catch(() => {});
     });
 
+    this.bot.action('guide', async (ctx) => {
+      await ctx.answerCbQuery();
+      await ctx.reply(
+        "📖 Qo'llanma:\n\n" +
+          "1️⃣ «Haridni boshlash» tugmasini bosing\n" +
+          "2️⃣ O'yin va paketni tanlang\n" +
+          "3️⃣ UID/ID ni kiriting\n" +
+          "4️⃣ Balansni to'ldiring va buyurtma bering\n\n" +
+          "Savollar bo'lsa: @Yoldashaliyev_19",
+      );
+    });
+
     // Deposit approve/reject callbacks
     this.bot.action(/^approve_deposit:(.+)$/, (ctx) =>
       this.handleDepositAction(ctx, 'approve', ctx.match[1]),
     );
     this.bot.action(/^reject_deposit:(.+)$/, (ctx) =>
       this.handleDepositAction(ctx, 'reject', ctx.match[1]),
+    );
+
+    // Order approve/reject callbacks
+    this.bot.action(/^approve_order:(.+)$/, (ctx) =>
+      this.handleOrderAction(ctx, 'approve', ctx.match[1]),
+    );
+    this.bot.action(/^reject_order:(.+)$/, (ctx) =>
+      this.handleOrderAction(ctx, 'reject', ctx.match[1]),
     );
   }
 
@@ -286,12 +364,43 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
+  private async handleOrderAction(
+    ctx: any,
+    action: OrderAction,
+    orderId: string,
+  ) {
+    try {
+      if (!this.orderActionHandler) {
+        await ctx.answerCbQuery('Xatolik: handler topilmadi');
+        return;
+      }
+
+      const result = await this.orderActionHandler(action, orderId);
+      await ctx.answerCbQuery(result);
+      await ctx.editMessageReplyMarkup({ inline_keyboard: [] }).catch(() => {});
+      await ctx.reply(result);
+    } catch (e: any) {
+      console.error(`[Bot] handleOrderAction (${action}) error:`, e?.message);
+      await ctx.answerCbQuery(e?.message?.slice(0, 190) ?? 'Xatolik').catch(() => {});
+    }
+  }
+
   // ─── Helper ──────────────────────────────────────────────────────────────────
 
   /**
    * Returns a guaranteed-https WebApp URL.
    * Telegram requires https:// for all Web App URLs — http:// silently breaks the button.
    */
+  private getStartImagePath(): string | null {
+    const candidates = [
+      path.join(__dirname, '..', '..', 'assets', 'GamePayBotImage.png'),
+      path.join(__dirname, '..', '..', '..', 'assets', 'GamePayBotImage.png'),
+      path.join(process.cwd(), 'assets', 'GamePayBotImage.png'),
+      path.join(process.cwd(), '..', 'GamePayBotImage.png'),
+    ];
+    return candidates.find((p) => fs.existsSync(p)) ?? null;
+  }
+
   private getWebAppUrl(): string {
     const raw =
       this.configService.get<string>('NEXT_PUBLIC_BASE_URL') ?? '';

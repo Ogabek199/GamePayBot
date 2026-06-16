@@ -10,15 +10,19 @@ import { twMerge } from 'tailwind-merge';
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+import { useTranslation } from '../stores/useTranslation';
 
-const navItems = [
-  { name: 'Bosh sahifa', icon: LayoutGrid, path: '/' },
-  { name: 'Hamyon', icon: Wallet, path: '/wallet' },
-  { name: 'Tarix', icon: Clock, path: '/history' },
-  { name: 'Profil', icon: User, path: '/profile' },
-];
-
+// ... (inside the component)
 export function BottomNav() {
+  const { t } = useTranslation();
+  const navItems = [
+    { name: t('common.home'), icon: LayoutGrid, path: '/' },
+    { name: t('common.wallet'), icon: Wallet, path: '/wallet' },
+    { name: t('common.history'), icon: Clock, path: '/history' },
+    { name: t('common.profile'), icon: User, path: '/profile' },
+  ];
+// ...
+
   const pathname = usePathname();
   const [mounted, setMounted] = React.useState(false);
 

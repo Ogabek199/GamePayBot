@@ -13,6 +13,7 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "copyfiles": "^2.4.1",
     "tsx": "^4.22.4"
   }
 }

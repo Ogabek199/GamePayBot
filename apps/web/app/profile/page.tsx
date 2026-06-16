@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { useTranslation } from '../../stores/useTranslation';
 import { User, CreditCard, Globe, Headset, ChevronRight, Award, Check } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { BackButton } from '../../components/BackButton';
 import { Modal } from '../../components/Modal';
+import { fetchWalletStats } from '../../services/api';
 
 export default function ProfilePage() {
   const { user } = useAuthStore();
@@ -14,9 +15,15 @@ export default function ProfilePage() {
   const router = useRouter();
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isSupportOpen, setIsSupportOpen] = useState(false);
-  React.useEffect(() => {
-    }, []);
+  const [balance, setBalance] = useState(0);
+  const [imgError, setImgError] = useState(false);
 
+  useEffect(() => {
+    if (!user) return;
+    fetchWalletStats()
+      .then((stats) => setBalance(Number(stats?.balance ?? 0)))
+      .catch(() => {});
+  }, [user]);
 
   const menuItems = [
     { icon: User, label: t('profile.personal_info'), onClick: () => router.push('/profile/personal') },
@@ -42,11 +49,17 @@ export default function ProfilePage() {
       <section className="text-center space-y-4">
         <div className="relative inline-block">
           <div className="w-24 h-24 md:w-32 md:h-32 rounded-[2rem] border-4 border-primary/20 p-1 overflow-hidden bg-card">
-            {user?.photoUrl && user.photoUrl.trim() ? (
-              <img src={user.photoUrl} alt="Avatar" className="w-full h-full object-cover rounded-[1.5rem]" onError={(e) => { (e.target as any).style.display = 'none'; }} />
+            {user?.photoUrl && !imgError ? (
+              <img
+                src={user.photoUrl}
+                alt="Avatar"
+                className="w-full h-full object-cover rounded-[1.5rem]"
+                referrerPolicy="no-referrer"
+                onError={() => setImgError(true)}
+              />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-3xl md:text-4xl font-bold bg-primary/10 text-primary">
-                {user?.firstName?.charAt(0) || 'U'}
+              <div className="w-full h-full flex items-center justify-center text-3xl md:text-4xl font-bold bg-primary/10 text-primary rounded-[1.5rem]">
+                {(user?.firstName || user?.username || 'U').charAt(0).toUpperCase()}
               </div>
             )}
           </div>
@@ -60,11 +73,10 @@ export default function ProfilePage() {
         </div>
       </section>
 
-      {/* Stats Row */}
       <section className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         <div className="glass-card p-4 md:p-6 text-center space-y-1">
           <p className="text-[10px] text-muted font-bold uppercase">{t('common.balance')}</p>
-          <p className="text-lg md:text-xl font-bold">0 {t('common.uzs')}</p>
+          <p className="text-lg md:text-xl font-bold">{balance.toLocaleString()} {t('common.uzs')}</p>
         </div>
         <div className="glass-card p-4 md:p-6 text-center space-y-1">
           <p className="text-[10px] text-muted font-bold uppercase">{t('profile.membership')}</p>
@@ -72,7 +84,6 @@ export default function ProfilePage() {
         </div>
       </section>
 
-      {/* Menu List */}
       <section className="space-y-3">
         {menuItems.map((item, i) => (
           <button 
@@ -94,7 +105,6 @@ export default function ProfilePage() {
         ))}
       </section>
 
-      {/* Language Modal */}
       <Modal 
         isOpen={isLangOpen} 
         onClose={() => setIsLangOpen(false)} 
@@ -122,7 +132,6 @@ export default function ProfilePage() {
         </div>
       </Modal>
 
-      {/* Support Modal */}
       <Modal 
         isOpen={isSupportOpen} 
         onClose={() => setIsSupportOpen(false)} 
@@ -130,18 +139,17 @@ export default function ProfilePage() {
       >
         <div className="space-y-4">
           <p className="text-sm text-muted text-center">Biz bilan bog'lanish uchun quyidagi usullardan foydalaning:</p>
-          <div className="grid grid-cols-2 gap-4">
-            <a href="https://t.me/admin" target="_blank" className="glass-card p-6 flex flex-col items-center space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center">
-                <Globe size={24} />
-              </div>
-              <span className="font-bold text-sm">Telegram</span>
+          <div className="flex flex-col gap-4">
+            <a 
+              href="https://t.me/Yoldashaliyev_19" 
+              target="_blank" 
+              className="w-full h-14 bg-primary text-bg font-bold rounded-2xl flex items-center justify-center space-x-2 hover:bg-primary/90 transition-all"
+            >
+              <Globe size={20} />
+              <span>Admin bilan bog'lanish</span>
             </a>
-            <div className="glass-card p-6 flex flex-col items-center space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-success/10 text-success flex items-center justify-center">
-                <Headset size={24} />
-              </div>
-              <span className="font-bold text-sm">Online Chat</span>
+            <div className="text-center text-xs text-muted">
+              Yoki telegram bot orqali murojaat qiling
             </div>
           </div>
         </div>

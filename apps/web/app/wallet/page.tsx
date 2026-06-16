@@ -9,6 +9,8 @@ import { BackButton } from '../../components/BackButton';
 import { Modal } from '../../components/Modal';
 import { fetchMyWallet, fetchMyTransactions } from '../../services/api';
 
+import { toast } from 'react-hot-toast';
+
 export default function WalletPage() {
   const router = useRouter();
   const { t } = useTranslation();
@@ -18,6 +20,7 @@ export default function WalletPage() {
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
   const [isPromoOpen, setIsPromoOpen] = useState(false);
   const [isCardsOpen, setIsCardsOpen] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
 
   useEffect(() => {
     Promise.all([
@@ -44,7 +47,7 @@ export default function WalletPage() {
       <header className="flex items-center justify-between">
         <BackButton />
         <h1 className="text-2xl font-bold">{t('common.wallet')}</h1>
-        <button className="w-10 h-10 rounded-full glass flex items-center justify-center text-primary active:scale-95 transition-all">
+        <button onClick={() => setIsPromoOpen(true)} className="w-10 h-10 rounded-full glass flex items-center justify-center text-primary active:scale-95 transition-all">
           <Gift size={20} />
         </button>
       </header>
@@ -110,20 +113,20 @@ export default function WalletPage() {
             let icon = ArrowUpRight;
             let iconClass = 'bg-danger/10 text-danger';
             let amountClass = 'text-white';
-            let title = 'Buyurtma to\'lovi';
+            let title = t('tx_types.order_payment');
             let sign = '-';
 
             if (isDeposit) {
               icon = ArrowDownLeft;
               iconClass = 'bg-success/10 text-success';
               amountClass = 'text-success';
-              title = 'Hisobni to\'ldirish';
+              title = t('tx_types.deposit');
               sign = '+';
             } else if (isRefund) {
               icon = ArrowDownLeft;
               iconClass = 'bg-blue-500/10 text-blue-500';
               amountClass = 'text-blue-500';
-              title = 'Mablag\' qaytarilishi';
+              title = t('tx_types.refund');
               sign = '+';
             }
 
@@ -151,19 +154,61 @@ export default function WalletPage() {
               </div>
             );
           }) : (
-             <p className="text-center text-muted text-sm py-4">Tranzaksiyalar yo'q</p>
+             <p className="text-center text-muted text-sm py-4">{t('tx_types.no_txs')}</p>
           )}
         </div>
       </section>
 
-      <Modal isOpen={isWithdrawOpen} onClose={() => setIsWithdrawOpen(false)} title="Mablag'ni yechib olish">
-        <p>Hozircha yechib olish funksiyasi mavjud emas. Administrator bilan bog'laning.</p>
+      <Modal isOpen={isWithdrawOpen} onClose={() => setIsWithdrawOpen(false)} title={t('wallet_modal.withdraw_title')}>
+        <div className="space-y-4 pt-2">
+          <p className="text-sm text-muted">{t('wallet_modal.withdraw_desc')}</p>
+          <a href="https://t.me/Yoldashaliyev_19" target="_blank" rel="noopener noreferrer" className="w-full glass-card border border-white/10 h-14 flex items-center justify-center space-x-2 font-bold mt-2 hover:bg-white/5 transition-colors rounded-xl">
+            {t('wallet_modal.contact_admin')}
+          </a>
+        </div>
       </Modal>
-      <Modal isOpen={isPromoOpen} onClose={() => setIsPromoOpen(false)} title="Promo kodlar">
-        <p>Hozircha promo kodlar bo'limi mavjud emas.</p>
+
+      <Modal isOpen={isPromoOpen} onClose={() => { setIsPromoOpen(false); setPromoCode(''); }} title={t('wallet_modal.promo_title')}>
+        <div className="space-y-4 pt-2">
+          <p className="text-sm text-muted text-center">{t('wallet_modal.promo_desc')}</p>
+          <input 
+            type="text" 
+            placeholder={t('wallet_modal.promo_placeholder')}
+            value={promoCode}
+            onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+            className="w-full h-14 bg-card rounded-2xl px-6 border border-border focus:border-primary/50 outline-none transition-all font-black tracking-[0.2em] text-center uppercase text-lg placeholder:text-muted/30" 
+          />
+          <button 
+            disabled={!promoCode.trim()}
+            onClick={() => {
+              toast.error(t('wallet_modal.promo_error'));
+              setTimeout(() => setIsPromoOpen(false), 1500);
+            }}
+            className="w-full btn-gold h-14 flex items-center justify-center font-bold disabled:opacity-50 transition-opacity"
+          >
+            {t('wallet_modal.activate')}
+          </button>
+        </div>
       </Modal>
-      <Modal isOpen={isCardsOpen} onClose={() => setIsCardsOpen(false)} title="Mening kartalarim">
-        <p>Hozircha kartalar bo'limi mavjud emas.</p>
+
+      <Modal isOpen={isCardsOpen} onClose={() => setIsCardsOpen(false)} title={t('wallet_modal.cards_title')}>
+        <div className="space-y-4 pt-2">
+          <div className="flex flex-col items-center justify-center py-6 text-center space-y-3">
+            <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center text-muted">
+              <CreditCard size={32} />
+            </div>
+            <p className="text-sm text-muted">{t('wallet_modal.cards_desc')}</p>
+          </div>
+          <button 
+            onClick={() => {
+              toast(t('wallet_modal.soon'), { icon: '🚧' });
+            }}
+            className="w-full glass-card h-14 flex items-center justify-center space-x-2 text-primary font-bold border border-primary/20 hover:bg-primary/10 transition-colors rounded-xl"
+          >
+            <Plus size={20} />
+            <span>{t('wallet_modal.add_card')}</span>
+          </button>
+        </div>
       </Modal>
     </main>
   );

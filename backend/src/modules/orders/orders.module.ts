@@ -3,8 +3,10 @@ import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
 import { JwtService } from '../../common/jwt.service';
 import JwtAuthGuard from '../../common/guards/jwt.guard';
+import { BotModule } from '../bot/bot.module';
 
 @Module({
+  imports: [BotModule],
   providers: [OrdersService, JwtService, JwtAuthGuard],
   controllers: [OrdersController],
   exports: [OrdersService],

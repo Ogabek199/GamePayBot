@@ -6,9 +6,11 @@ import { ChevronLeft, Check, CreditCard, ChevronRight } from 'lucide-react';
 import { BackButton } from '../../../components/BackButton';
 import toast from 'react-hot-toast';
 import { fetchPaymentCards } from '../../../services/api';
+import { useTranslation } from '../../../stores/useTranslation';
 
 export default function DepositPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [amount, setAmount] = useState('');
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
@@ -26,7 +28,7 @@ export default function DepositPage() {
             setCards(data);
             setSelectedMethod(data[0].id);
           } else {
-            setFetchError("Hozircha to'lov kartalari mavjud emas");
+            setFetchError(t('wallet.no_active_cards'));
           }
         })
         .catch((err) => {
@@ -66,7 +68,7 @@ export default function DepositPage() {
         >
           <ChevronLeft size={20} />
         </button>
-        <h1 className="text-lg font-bold">Hisobni to'ldirish</h1>
+        <h1 className="text-lg font-bold">{t('wallet.deposit_title')}</h1>
         <div className="w-10 h-10" />
       </header>
 
@@ -80,7 +82,7 @@ export default function DepositPage() {
         <section className="space-y-8">
           <div className="bg-card rounded-[2.5rem] md:rounded-[3rem] p-6 md:p-8 border border-border shadow-premium relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl"></div>
-            <p className="text-center text-muted text-[10px] font-bold uppercase tracking-widest mb-6">To'lov summasini kiriting</p>
+            <p className="text-center text-muted text-[10px] font-bold uppercase tracking-widest mb-6">{t('wallet.deposit_amount')}</p>
             <div className="flex flex-col items-center gap-2">
               <div className="flex items-center space-x-2 justify-center flex-wrap">
                 <input 
@@ -111,13 +113,13 @@ export default function DepositPage() {
       ) : (
         <section className="space-y-6">
           <div className="px-1">
-            <h3 className="text-sm font-bold text-muted uppercase tracking-widest">To'lov usulini tanlang</h3>
+            <h3 className="text-sm font-bold text-muted uppercase tracking-widest">{t('wallet.deposit_cards')}</h3>
           </div>
           <div className="space-y-3">
             {isLoadingCards ? (
               <div className="text-center py-8">
                 <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto"></div>
-                <p className="text-muted text-sm mt-3">Karta turlari yuklanmoqda...</p>
+                <p className="text-muted text-sm mt-3">{t('wallet.loading_cards')}</p>
               </div>
             ) : fetchError ? (
               <div className="text-center py-8 bg-danger/10 rounded-2xl border border-danger/20 p-4">
@@ -125,7 +127,7 @@ export default function DepositPage() {
               </div>
             ) : cards.length === 0 ? (
               <div className="text-center py-8 bg-danger/10 rounded-2xl border border-danger/20 p-4">
-                <p className="text-danger font-bold text-sm">Hozircha to'lov kartalari mavjud emas</p>
+                <p className="text-danger font-bold text-sm">{t('wallet.no_active_cards')}</p>
               </div>
             ) : (
               cards.map((card) => {
@@ -167,7 +169,7 @@ export default function DepositPage() {
       )}
 
       {/* Action Button - Fixed at bottom */}
-      <div className="fixed bottom-24 md:bottom-4 left-0 right-0 px-4 md:px-6 z-30 pointer-events-none">
+      <div className="fixed bottom-16 md:bottom-4 left-0 right-0 px-4 md:px-6 z-30 pointer-events-none">
         <div className="max-w-4xl mx-auto pointer-events-auto">
           <button
             onClick={handleNext}
@@ -178,7 +180,7 @@ export default function DepositPage() {
               : 'bg-card text-muted opacity-50 cursor-not-allowed scale-95'
             }`}
           >
-            {step === 1 ? 'Davom etish' : 'To\'lovga o\'tish'}
+            {step === 1 ? t('wallet.continue') : t('wallet.proceed_payment')}
           </button>
         </div>
       </div>

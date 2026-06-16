@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Query, Param, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, UseGuards } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import JwtAuthGuard from '../../common/guards/jwt.guard';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -11,16 +11,12 @@ export class OrdersController {
 
   @Post()
   create(@Body() body: CreateOrderDto, @CurrentUser() user: any) {
-    // attach userId
-    const data = { ...body, userId: user.sub };
-    return this.service.create(data);
+    return this.service.purchase(user.sub, body.packageId, body.uid, body.region);
   }
 
   @Get()
-  findByUser(@Query('userId') userId: string, @CurrentUser() user: any) {
-    // if userId not provided, use current user
-    const uid = userId || user.sub;
-    return this.service.findByUser(uid);
+  findByUser(@CurrentUser() user: any) {
+    return this.service.findByUser(user.sub);
   }
 
   @Get(':id')

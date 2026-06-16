@@ -17,12 +17,25 @@
     "uzs": "UZS"
   },
   "home": {
-    "popular_games": "Popular Games",
+    "popular_games": "Popular games",
     "see_all": "See All",
     "fast_payment": "Fast Payment",
     "auto_system": "Auto System",
     "support_247": "24/7 Support",
-    "always_online": "Always Online"
+    "always_online": "Always Online",
+    "welcome": "Welcome,",
+    "user": "User",
+    "your_balance": "Your balance",
+    "topup": "Top up",
+    "choose_game": "Choose a game",
+    "no_games": "No games available yet",
+    "today_topup": "Today topups",
+    "pending_reqs": "Pending",
+    "request": "Requests",
+    "premium_topups": "Premium topups",
+    "premium_desc": "Use premium service for faster processing",
+    "secure_topups": "Secure payments",
+    "secure_desc": "All payments are encrypted and safe"
   },
   "profile": {
     "personal_info": "Personal Info",
@@ -44,5 +57,64 @@
     "enter_amount": "Enter Amount",
     "select_method": "Select Method",
     "pay_confirm": "I've Paid"
+  },
+  "profile_personal": {
+    "title": "Personal Info",
+    "debug": "Debug",
+    "profile_photo_desc": "Telegram profile photo is used",
+    "name": "Name",
+    "name_placeholder": "Enter your name",
+    "username": "Username",
+    "telegram_id": "Telegram ID",
+    "unknown": "unknown",
+    "security_note": "Your data is securely connected via Telegram. You can change your name here, other data updates automatically.",
+    "update": "Update Info",
+    "connection_success": "Backend connection successful!",
+    "connection_failed": "Could not connect to backend!",
+    "update_success": "Info updated successfully!",
+    "update_failed": "Error occurred. Please try again."
+  },
+  "wallet_modal": {
+    "withdraw_title": "Withdraw Funds",
+    "withdraw_desc": "Withdrawal feature is currently not available. If you want a refund, please contact the administrator.",
+    "contact_admin": "Contact Admin",
+    "promo_title": "Promo Code",
+    "promo_desc": "Enter a special promo code to get bonus funds to your account.",
+    "promo_placeholder": "PROMO CODE",
+    "promo_error": "This promo code does not exist or has expired",
+    "activate": "Activate",
+    "cards_title": "My Cards",
+    "cards_desc": "You have no saved payment cards yet. You can save a card during top-up.",
+    "soon": "Coming soon",
+    "add_card": "Add New Card"
+  },
+  "tx_types": {
+    "order_payment": "Order Payment",
+    "deposit": "Account Top-up",
+    "refund": "Refund",
+    "no_txs": "No transactions"
+  },
+  "history_page": {
+    "status_pending": "Pending",
+    "status_completed": "Approved",
+    "status_cancelled": "Rejected",
+    "search_placeholder": "Search (ID or Name)...",
+    "card_manual": "Card (Manual)",
+    "payment_method": "Payment Method",
+    "date": "Date",
+    "reject_reason": "Reason for rejection",
+    "deposit_amount": "Deposit Amount",
+    "info": "Info",
+    "note": "Note",
+    "paid_amount": "Paid Amount",
+    "no_data": "No data found",
+    "card": "Card"
+  },
+  "games": {
+    "fetch_error": "Error loading game data",
+    "order_success": "Order accepted! Admin will process it shortly.",
+    "error_occurred": "An error occurred",
+    "not_found": "Game not found",
+    "place_order": "Place Order"
   }
 }

@@ -146,7 +146,7 @@ export class AuthService {
       update: {
         username:  tgUser.username   ?? undefined,
         firstName: tgUser.first_name ?? undefined,
-        // photo_url is NOT in initData — keep whatever was saved during /start
+        photoUrl:  tgUser.photo_url  ?? undefined,
       },
       create: {
         telegramId,

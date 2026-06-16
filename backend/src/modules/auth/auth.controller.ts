@@ -24,7 +24,12 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Patch('profile')
   async updateProfile(@CurrentUser() user: any, @Body() body: { firstName: string }) {
-    return this.authService.updateProfile(user.sub, body);
+    try {
+      return await this.authService.updateProfile(user.sub, body);
+    } catch (err: any) {
+      console.error('Update profile error:', err?.message || err);
+      throw err;
+    }
   }
 
   @Post('test-connection')

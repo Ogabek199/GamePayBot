@@ -5,20 +5,34 @@ import { loginWithTelegram } from '../services/api';
 
 export default function TelegramAuth() {
   const { setAuth, setAuthenticating, token, user } = useAuthStore();
-  // useRef — re-render bo'lsa ham bir marta ishlaydi
   const initiated = useRef(false);
 
   useEffect(() => {
-    // Hydration kutish — persist store yuklanishi kerak
+    if (initiated.current) return;
+    initiated.current = true;
+
+    if (typeof window === 'undefined') return;
+
+    // DEV MODE: Telegram bo'lmasa darhol mock user o'rnat (async kutmasdan)
+    if (process.env.NODE_ENV !== 'production') {
+      const hasTelegramData = !!window.Telegram?.WebApp?.initData;
+      if (!hasTelegramData) {
+        console.warn('[TelegramAuth] Dev mode: Mock user o\'rnatildi');
+        setAuth('dev-mock-token', {
+          id: 'dev-user-id',
+          telegramId: '123456789',
+          firstName: 'Developer',
+          username: 'dev_user',
+          photoUrl: null,
+          role: 'USER',
+        });
+        return;
+      }
+    }
+
+    // PRODUCTION: Telegram WebApp orqali login
     const run = async () => {
-      // Allaqachon ishlayapti — ikkinchi marta chaqirilmasin
-      if (initiated.current) return;
-      initiated.current = true;
-
-      // Telegram WebApp mavjudligini tekshir
-      if (typeof window === 'undefined') return;
-
-      // WebApp skripti yuklanishini kut (max 3 soniya)
+      // WebApp SDK yuklanishini kut (max 3 soniya)
       let attempts = 0;
       while (!window.Telegram?.WebApp && attempts < 30) {
         await new Promise((r) => setTimeout(r, 100));
@@ -43,27 +57,18 @@ export default function TelegramAuth() {
         return;
       }
 
-      // Token va user allaqachon localStorage da saqlangan bo'lsa —
-      // initData ni yangilash uchun baribir re-auth qilamiz
-      // (token eskirgan bo'lishi mumkin)
       setAuthenticating(true);
 
       try {
-        console.log('[TelegramAuth] Login boshlandi...');
         const result = await loginWithTelegram(initData);
         setAuth(result.token, result.user);
-        console.log('[TelegramAuth] Muvaffaqiyatli:', result.user?.firstName);
+        console.log('[TelegramAuth] Login muvaffaqiyatli:', result.user?.firstName);
       } catch (err: any) {
         console.error('[TelegramAuth] Login xatosi:', err?.response?.data || err?.message);
-
-        // Agar token va user localStorage da saqlangan bo'lsa — ishlataveramiz
-        // Faqat to'liq yo'q bo'lsa xato ko'rsat
         if (token && user) {
-          console.warn('[TelegramAuth] Eski session dan foydalanilmoqda');
-          setAuthenticating(false);
-        } else {
-          setAuthenticating(false);
+          console.warn('[TelegramAuth] Eski session ishlatilmoqda');
         }
+        setAuthenticating(false);
       }
     };
 

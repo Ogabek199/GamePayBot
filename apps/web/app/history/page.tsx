@@ -36,7 +36,7 @@ export default function HistoryPage() {
   const router = useRouter();
   const { t } = useTranslation();
   const [search, setSearch] = useState('');
-  const [mainTab, setMainTab] = useState<'all' | 'orders' | 'deposits'>('all');
+  const [mainTab, setMainTab] = useState<'pending' | 'completed' | 'cancelled'>('pending');
   const [orders, setOrders] = useState<any[]>([]);
   const [deposits, setDeposits] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -73,12 +73,12 @@ export default function HistoryPage() {
     }));
     
     let items: any[] = [];
-    if (mainTab === 'all') {
-      items = [...formattedOrders, ...formattedDeposits];
-    } else if (mainTab === 'orders') {
-      items = formattedOrders;
-    } else if (mainTab === 'deposits') {
-      items = formattedDeposits;
+    if (mainTab === 'pending') {
+      items = [...formattedOrders, ...formattedDeposits].filter(i => i.status === 'pending' || i.status === 'processing');
+    } else if (mainTab === 'completed') {
+      items = [...formattedOrders, ...formattedDeposits].filter(i => i.status === 'approved' || i.status === 'completed');
+    } else if (mainTab === 'cancelled') {
+      items = [...formattedOrders, ...formattedDeposits].filter(i => i.status === 'rejected' || i.status === 'cancelled');
     }
 
     return items.sort((a, b) => b.date.getTime() - a.date.getTime());
@@ -104,9 +104,9 @@ export default function HistoryPage() {
       {/* Main Tabs */}
       <section className="flex border-b border-white/5 pb-px">
         {[
-          { id: 'all', label: 'Barchasi' },
-          { id: 'orders', label: 'Buyurtmalar' },
-          { id: 'deposits', label: 'Depositlar' },
+          { id: 'pending', label: t('history_page.status_pending') },
+          { id: 'completed', label: t('history_page.status_completed') },
+          { id: 'cancelled', label: t('history_page.status_cancelled') },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -127,7 +127,7 @@ export default function HistoryPage() {
         <div className="relative">
           <input 
             type="text" 
-            placeholder="Qidirish (ID yoki Nomi)..." 
+            placeholder={t('history_page.search_placeholder')}
             className="w-full h-12 bg-card rounded-xl px-11 border border-border focus:border-primary/50 outline-none text-sm"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -155,7 +155,7 @@ export default function HistoryPage() {
                         <ArrowDownLeft size={24} />
                       </div>
                       <div>
-                        <h4 className="font-bold text-sm">Hisobni to'ldirish</h4>
+                        <h4 className="font-bold text-sm">{t('tx_types.deposit')}</h4>
                         <p className="text-[10px] text-muted font-bold">
                           {item.card?.bankName || 'Karta'} (..{item.card?.cardNumber?.slice(-4) || ''})
                         </p>
@@ -174,11 +174,11 @@ export default function HistoryPage() {
                         <p className="text-[11px] font-bold">#{String(item.id).slice(0, 8)}</p>
                       </div>
                       <div className="space-y-0.5 text-right">
-                        <p className="text-[8px] text-muted font-bold uppercase tracking-tighter">To'lov usuli</p>
-                        <p className="text-[11px] font-bold">Karta (Manual)</p>
+                        <p className="text-[8px] text-muted font-bold uppercase tracking-tighter">{t('history_page.payment_method')}</p>
+                        <p className="text-[11px] font-bold">{t('history_page.card')} (Manual)</p>
                       </div>
                       <div className="space-y-0.5">
-                        <p className="text-[8px] text-muted font-bold uppercase tracking-tighter">Sana</p>
+                        <p className="text-[8px] text-muted font-bold uppercase tracking-tighter">{t('history_page.date')}</p>
                         <div className="flex items-center text-[10px] text-muted font-medium">
                           <Calendar size={10} className="mr-1" /> {item.date.toLocaleDateString()}
                         </div>
@@ -187,13 +187,13 @@ export default function HistoryPage() {
                     
                     {item.adminNote && (
                       <div className="bg-danger/10 border border-danger/20 rounded-xl p-3 mt-2">
-                        <p className="text-[9px] text-danger font-bold uppercase tracking-tighter mb-1">Rad etilish sababi</p>
+                        <p className="text-[9px] text-danger font-bold uppercase tracking-tighter mb-1">{t('history_page.reject_reason')}</p>
                         <p className="text-xs text-danger-foreground font-medium">{item.adminNote}</p>
                       </div>
                     )}
                     
                     <div className="pt-2 flex justify-between items-center border-t border-white/5 mt-2">
-                      <span className="text-[10px] text-muted font-bold uppercase">To'ldirilgan summa</span>
+                      <span className="text-[10px] text-muted font-bold uppercase">{t('history_page.deposit_amount')}</span>
                       <p className="font-black text-lg text-success">+{Number(item.amount).toLocaleString('ru-RU')} {t('common.uzs')}</p>
                     </div>
                   </div>
@@ -228,15 +228,15 @@ export default function HistoryPage() {
                       <p className="text-[11px] font-bold">#{String(item.id).slice(0, 8)}</p>
                     </div>
                     <div className="space-y-0.5 text-right">
-                      <p className="text-[8px] text-muted font-bold uppercase tracking-tighter">To'lov usuli</p>
-                      <p className="text-[11px] font-bold">Balans</p>
+                      <p className="text-[8px] text-muted font-bold uppercase tracking-tighter">{t('history_page.payment_method')}</p>
+                      <p className="text-[11px] font-bold">{t('common.balance')}</p>
                     </div>
                     <div className="space-y-0.5">
-                      <p className="text-[8px] text-muted font-bold uppercase tracking-tighter">Ma'lumot</p>
+                      <p className="text-[8px] text-muted font-bold uppercase tracking-tighter">{t('history_page.info')}</p>
                       <p className="text-[10px] font-medium text-primary line-clamp-1">{item.uid}</p>
                     </div>
                     <div className="space-y-0.5 text-right">
-                      <p className="text-[8px] text-muted font-bold uppercase tracking-tighter">Sana</p>
+                      <p className="text-[8px] text-muted font-bold uppercase tracking-tighter">{t('history_page.date')}</p>
                       <div className="flex items-center justify-end text-[10px] text-muted font-medium">
                         <Calendar size={10} className="mr-1" /> {item.date.toLocaleDateString()}
                       </div>
@@ -245,13 +245,13 @@ export default function HistoryPage() {
 
                   {item.adminNote && (
                     <div className="bg-danger/10 border border-danger/20 rounded-xl p-3 mt-2">
-                      <p className="text-[9px] text-danger font-bold uppercase tracking-tighter mb-1">Izoh</p>
+                      <p className="text-[9px] text-danger font-bold uppercase tracking-tighter mb-1">{t('history_page.note')}</p>
                       <p className="text-xs text-danger-foreground font-medium">{item.adminNote}</p>
                     </div>
                   )}
 
                   <div className="pt-2 flex justify-between items-center border-t border-white/5 mt-2">
-                    <span className="text-[10px] text-muted font-bold uppercase">To'langan summa</span>
+                    <span className="text-[10px] text-muted font-bold uppercase">{t('history_page.paid_amount')}</span>
                     <p className="font-black text-lg text-white">{Number(item.price).toLocaleString('ru-RU')} {t('common.uzs')}</p>
                   </div>
                 </div>
@@ -264,7 +264,7 @@ export default function HistoryPage() {
             <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto text-muted/30">
               <ShoppingBag size={32} />
             </div>
-            <p className="text-muted text-sm">Hech qanday ma'lumot topilmadi</p>
+            <p className="text-muted text-sm">{t('history_page.no_data')}</p>
           </div>
         )}
       </section>

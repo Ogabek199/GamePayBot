@@ -24,7 +24,20 @@
     "fast_payment": "Tezkor to'lov",
     "auto_system": "Avtomatik tizim",
     "support_247": "24/7 Qo'llab",
-    "always_online": "Doimiy aloqa"
+    "always_online": "Doimiy aloqa",
+    "welcome": "Xush kelibsiz,",
+    "user": "Foydalanuvchi",
+    "your_balance": "Sizning balansingiz",
+    "topup": "To'ldirish",
+    "choose_game": "O'yin tanlang",
+    "no_games": "Hozircha o'yinlar mavjud emas",
+    "today_topup": "Bugungi to'lovlar",
+    "pending_reqs": "Tasdiqlanmagan",
+    "request": "So'rov",
+    "premium_topups": "Premium to'lovlar",
+    "premium_desc": "Tezroq ishlash uchun premium xizmatdan foydalaning",
+    "secure_topups": "Xavfsiz to'lovlar",
+    "secure_desc": "Barcha to'lovlar shifrlangan va xavfsizdir"
   },
   "auth": {
     "auth_failed": "Autentifikatsiya muvaffaqiyatsiz tugadi. Iltimos, qayta urinib ko'ring.",
@@ -81,7 +94,12 @@
     "uid": "Foydalanuvchi ID (UID)",
     "enter_uid": "UID kiriting",
     "region": "Region",
-    "select_package": "Paketni tanlang"
+    "select_package": "Paketni tanlang",
+    "fetch_error": "O'yin ma'lumotlarini yuklashda xatolik",
+    "order_success": "Buyurtma qabul qilindi! Admin tez orada bajaradi.",
+    "error_occurred": "Xatolik yuz berdi",
+    "not_found": "O'yin topilmadi",
+    "place_order": "Buyurtma berish"
   },
   "profile_personal": {
     "title": "Shaxsiy ma'lumotlar",
@@ -98,5 +116,41 @@
     "connection_failed": "Backendga ulanib bo'lmadi!",
     "update_success": "Ma'lumotlar muvaffaqiyatli yangilandi!",
     "update_failed": "Xatolik yuz berdi. Iltimos qaytadan urinib ko'ring."
+  },
+  "wallet_modal": {
+    "withdraw_title": "Mablag'ni yechib olish",
+    "withdraw_desc": "Hozircha yechib olish funksiyasi mavjud emas. Agar balansdagi pulni qaytarib olmoqchi bo'lsangiz, iltimos administrator bilan bog'laning.",
+    "contact_admin": "Admin bilan bog'lanish",
+    "promo_title": "Promo kod",
+    "promo_desc": "Maxsus promo kodni kiritib, hisobingizga bonus mablag' oling.",
+    "promo_placeholder": "PROMO KOD",
+    "promo_error": "Bunday promo kod mavjud emas yoki muddati o'tgan",
+    "activate": "Faollashtirish",
+    "cards_title": "Mening kartalarim",
+    "cards_desc": "Sizda hali saqlangan to'lov kartalari mavjud emas. Kartani hisob to'ldirish vaqtida saqlab qolishingiz mumkin.",
+    "soon": "Tez orada ishga tushadi",
+    "add_card": "Yangi karta qo'shish"
+  },
+  "tx_types": {
+    "order_payment": "Buyurtma to'lovi",
+    "deposit": "Hisobni to'ldirish",
+    "refund": "Mablag' qaytarilishi",
+    "no_txs": "Tranzaksiyalar yo'q"
+  },
+  "history_page": {
+    "status_pending": "Kutilmoqda",
+    "status_completed": "Tasdiqlangan",
+    "status_cancelled": "Rad etilgan",
+    "search_placeholder": "Qidirish (ID yoki Nomi)...",
+    "card_manual": "Karta (Manual)",
+    "payment_method": "To'lov usuli",
+    "date": "Sana",
+    "reject_reason": "Rad etilish sababi",
+    "deposit_amount": "To'ldirilgan summa",
+    "info": "Ma'lumot",
+    "note": "Izoh",
+    "paid_amount": "To'langan summa",
+    "no_data": "Hech qanday ma'lumot topilmadi",
+    "card": "Karta"
   }
 }
