@@ -33,10 +33,14 @@ export async function loginWithTelegram(initData: string) {
 }
 
 export async function updateProfile(data: { firstName: string }) {
-  console.log('Updating profile with:', data);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('Updating profile with:', data);
+  }
   try {
     const resp = await api.patch('/auth/profile', data);
-    console.log('Update response:', resp.data);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Update response:', resp.data);
+    }
     return resp.data;
   } catch (error: any) {
     console.error('API Error details:', error.response?.data || error.message);
@@ -94,7 +98,9 @@ export async function fetchMyTransactions() {
 export async function pingBackend() {
   try {
     const resp = await api.post('/auth/test-connection');
-    console.log('Ping response:', resp.data);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('Ping response:', resp.data);
+    }
     return true;
   } catch (error: any) {
     console.error('Ping failed:', error.message);
