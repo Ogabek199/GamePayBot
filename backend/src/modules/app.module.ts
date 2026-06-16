@@ -14,6 +14,8 @@ import { PrismaModule } from '../common/prisma.module';
 
 import { BotModule } from './bot/bot.module';
 
+import { HealthController } from './health/health.controller';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
@@ -30,7 +32,7 @@ import { BotModule } from './bot/bot.module';
     AdminModule,
     SupportModule,
   ],
-  controllers: [],
+  controllers: [HealthController],
   providers: [],
 })
 export class AppModule {}
