@@ -31,25 +31,30 @@ function PaymentContent() {
     return () => clearInterval(timer);
   }, [timeLeft]);
 
-  useEffect(() => {
+  const loadCardData = async () => {
     setIsLoadingCard(true);
     setErrorMsg(null);
-    fetchPaymentCards()
-      .then((cards) => {
-        const found = cards.find((c: any) => c.id === cardType);
-        if (found) {
-          setCardData(found);
-        } else {
-          setErrorMsg("To'lov kartasi topilmadi");
-        }
-      })
-      .catch((err) => {
-        setErrorMsg("Karta ma'lumotlarini yuklashda xatolik yuz berdi");
-        console.error('Fetch card error:', err);
-      })
-      .finally(() => {
-        setIsLoadingCard(false);
-      });
+    try {
+      const cards = await fetchPaymentCards();
+      const found = cards.find((c: any) => c.id === cardType);
+      if (found) {
+        setCardData(found);
+      } else {
+        setCardData(null);
+        setErrorMsg("To'lov kartasi topilmadi");
+      }
+    } catch (err: any) {
+      const apiMessage = err?.response?.data?.message || err?.message || "Karta ma'lumotlarini yuklashda xatolik yuz berdi";
+      setErrorMsg(Array.isArray(apiMessage) ? apiMessage[0] : apiMessage);
+      // eslint-disable-next-line no-console
+      console.error('Fetch card error:', err);
+    } finally {
+      setIsLoadingCard(false);
+    }
+  };
+
+  useEffect(() => {
+    loadCardData();
   }, [cardType]);
 
   const formatTime = (seconds: number) => {
@@ -130,6 +135,12 @@ function PaymentContent() {
       <main className="min-h-screen p-4 md:p-6 max-w-4xl mx-auto flex flex-col items-center justify-center space-y-4">
         <BackButton />
         <p className="text-danger font-bold text-center text-sm">{errorMsg}</p>
+        <button
+          onClick={loadCardData}
+          className="mt-3 px-4 py-2 rounded-full bg-primary text-white font-bold hover:opacity-90 transition"
+        >
+          Qayta urinib ko'rish
+        </button>
       </main>
     );
   }
