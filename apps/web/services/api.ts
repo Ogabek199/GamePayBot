@@ -9,14 +9,9 @@ const api = axios.create({
 // Request: attach JWT if present
 api.interceptors.request.use((cfg) => {
   const token = useAuthStore.getState().token;
-  
   if (token) {
     cfg.headers.Authorization = `Bearer ${token}`;
-    console.log('DEBUG: Authorization header set directly from Zustand:', cfg.url);
-  } else {
-    console.warn('DEBUG: No token found in Zustand store.');
   }
-  
   return cfg;
 });
 
@@ -24,9 +19,7 @@ api.interceptors.request.use((cfg) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
-       console.error('DEBUG: 401 Unauthorized detected');
-    }
+    // Let callers decide how to surface errors; keep interceptor minimal.
     return Promise.reject(err);
   }
 );
