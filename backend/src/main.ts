@@ -25,8 +25,10 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   const port = process.env.PORT ? Number(process.env.PORT) : 4000;
   await app.listen(port, '0.0.0.0');
-  console.log(`Backend is running on: http://localhost:${port}`);
-  console.log(`For mobile devices, use: http://${require('os').networkInterfaces()['en0']?.[1]?.address || 'YOUR_IP'}:${port}`);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`Backend is running on: http://localhost:${port}`);
+    console.log(`For mobile devices, use: http://${require('os').networkInterfaces()['en0']?.[1]?.address || 'YOUR_IP'}:${port}`);
+  }
 }
 
 bootstrap();
