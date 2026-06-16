@@ -3,3 +3,6 @@ node_modules
 .env
 dist
 build
+
+# Local prisma sqlite file
+/prisma/dev.db
