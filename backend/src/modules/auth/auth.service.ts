@@ -10,7 +10,9 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 verifyTelegramInitData(initData: string, botToken: string): Record<string, string> {
-  console.log('DEBUG: botToken used for verification:', botToken);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('DEBUG: botToken used for verification:', botToken);
+  }
   // initData is the raw query string from Telegram WebApp
   const params = initData.split('&').map(p => {
 // ... (rest of the file)
@@ -26,12 +28,16 @@ verifyTelegramInitData(initData: string, botToken: string): Record<string, strin
       .map(([k, v]) => `${k}=${v}`)
       .sort();
     const dataCheckString = dataCheckArray.join('\n');
-    console.log('DEBUG: dataCheckString:', dataCheckString);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('DEBUG: dataCheckString:', dataCheckString);
+    }
 
     const secretKey = crypto.createHash('sha256').update(botToken).digest();
     const hmac = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
-    console.log('DEBUG: hmac:', hmac);
-    console.log('DEBUG: hash:', hash);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('DEBUG: hmac:', hmac);
+      console.log('DEBUG: hash:', hash);
+    }
 
     // Timing safe compare
     const hashLower = hash.toLowerCase();
