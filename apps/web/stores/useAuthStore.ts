@@ -20,9 +20,12 @@ export const useAuthStore = create<AuthState>()(
       language: 'uz',
       isAuthenticating: true,
       setAuth: (t, u) => {
-        console.log('DEBUG: Setting auth, token:', t);
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('DEBUG: Setting auth, token:', t);
+        }
         set(() => ({ token: t, user: u, isAuthenticating: false }));
       },
+
       setAuthenticating: (val) => set(() => ({ isAuthenticating: val })),
       updateUser: (u) => set((state) => ({ user: { ...state.user, ...u } })),
       setLanguage: (lang) => set(() => ({ language: lang })),
