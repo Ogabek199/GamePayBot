@@ -15,7 +15,9 @@ export class AuthController {
   @Post('telegram')
   async telegram(@Body() body: TelegramAuthDto) {
     const botToken = this.configService.get<string>('BOT_TOKEN');
-    console.log('DEBUG: Bot token from config:', botToken);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('DEBUG: Bot token from config:', botToken);
+    }
     const result = await this.authService.telegramLogin(body.initData, botToken || '');
     return result;
   }
