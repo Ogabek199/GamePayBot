@@ -5,11 +5,21 @@ import { useAuthStore } from '../stores/useAuthStore';
 import { loginWithTelegram } from '../services/api';
 
 export default function TelegramAuth() {
-  const { setAuth, setAuthenticating } = useAuthStore();
+  const { setAuth, setAuthenticating, user, token } = useAuthStore();
 
   useEffect(() => {
+    // Only run once, and only if not already authenticated
+    const hasRunBefore = sessionStorage.getItem('telegram_auth_attempted');
+    if (hasRunBefore || (token && user)) {
+      setAuthenticating(false);
+      return;
+    }
+
     const initTelegram = async () => {
-      console.log('AUTO_AUTH: Checking Telegram WebApp...');
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('AUTO_AUTH: Checking Telegram WebApp...');
+      }
+      sessionStorage.setItem('telegram_auth_attempted', 'true');
 
       if (typeof window === 'undefined' || !window.Telegram?.WebApp) {
         console.error('AUTO_AUTH: Telegram WebApp not detected.');
@@ -29,10 +39,14 @@ export default function TelegramAuth() {
       }
 
       try {
-        console.log('AUTO_AUTH: Attempting automatic login with initData...');
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('AUTO_AUTH: Attempting automatic login with initData...');
+        }
         const { token, user } = await loginWithTelegram(initData);
         
-        console.log('AUTO_AUTH: Success, updating store.');
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('AUTO_AUTH: Success, updating store with user:', user);
+        }
         setAuth(token, user);
       } catch (error) {
         console.error('AUTO_AUTH: Automatic login failed:', error);
@@ -41,12 +55,11 @@ export default function TelegramAuth() {
     };
 
     initTelegram();
-  }, [setAuth, setAuthenticating]);
+  }, []); // Empty dependency array - run only once
 
   return null;
 }
 
-// Add Telegram type definition to window
 declare global {
   interface Window {
     Telegram: {
