@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 import { SupportService } from './support.service';
 
-@Controller('support')
+@Controller('api/v1/support')
 export class SupportController {
   constructor(private readonly service: SupportService) {}
 

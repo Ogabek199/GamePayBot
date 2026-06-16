@@ -3,13 +3,13 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { useTranslation } from '../../stores/useTranslation';
-import { User, Shield, CreditCard, Globe, Headset, LogOut, ChevronRight, Award, Check } from 'lucide-react';
+import { User, CreditCard, Globe, Headset, ChevronRight, Award, Check } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { BackButton } from '../../components/BackButton';
-import { BottomSheet } from '../../components/BottomSheet';
+import { Modal } from '../../components/Modal';
 
 export default function ProfilePage() {
-  const { user, logout } = useAuthStore();
+  const { user } = useAuthStore();
   const { lang, setLang, t } = useTranslation();
   const router = useRouter();
   const [isLangOpen, setIsLangOpen] = useState(false);
@@ -21,11 +21,6 @@ export default function ProfilePage() {
   }, []);
 
   if (!mounted) return null;
-
-  const handleLogout = () => {
-    logout();
-    router.push('/');
-  };
 
   const menuItems = [
     { icon: User, label: t('profile.personal_info'), onClick: () => router.push('/profile/personal') },
@@ -41,10 +36,10 @@ export default function ProfilePage() {
   ];
 
   return (
-    <main className="min-h-screen animate-fade-in p-4 md:p-6 pb-32 md:pb-8 max-w-4xl mx-auto space-y-8 md:ml-20 lg:ml-64">
+    <div className="max-w-3xl mx-auto w-full h-full space-y-8 animate-fade-in">
       <header className="flex items-center justify-between">
         <BackButton />
-        <h1 className="text-lg font-bold">{t('common.profile')}</h1>
+        <h1 className="text-xl font-bold">{t('common.profile')}</h1>
         <div className="w-10 h-10" />
       </header>
 
@@ -103,17 +98,8 @@ export default function ProfilePage() {
         ))}
       </section>
 
-      {/* Logout Button */}
-      <button 
-        onClick={handleLogout}
-        className="w-full h-14 rounded-2xl border border-danger/20 bg-danger/5 text-danger font-bold flex items-center justify-center space-x-2 active:scale-95 transition-all"
-      >
-        <LogOut size={20} />
-        <span>{t('common.logout')}</span>
-      </button>
-
-      {/* Language Bottom Sheet */}
-      <BottomSheet 
+      {/* Language Modal */}
+      <Modal 
         isOpen={isLangOpen} 
         onClose={() => setIsLangOpen(false)} 
         title={t('profile.select_language')}
@@ -138,10 +124,10 @@ export default function ProfilePage() {
             </button>
           ))}
         </div>
-      </BottomSheet>
+      </Modal>
 
-      {/* Support Bottom Sheet */}
-      <BottomSheet 
+      {/* Support Modal */}
+      <Modal 
         isOpen={isSupportOpen} 
         onClose={() => setIsSupportOpen(false)} 
         title={t('common.support')}
@@ -163,7 +149,7 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
-      </BottomSheet>
-    </main>
+      </Modal>
+    </div>
   );
 }

@@ -2,7 +2,7 @@ import { Controller, Get, Patch, Body, Param, Query, BadRequestException } from 
 import { AdminService } from './admin.service';
 import { UpdateDepositStatusDto } from '../deposits/dto/update-deposit.dto';
 
-@Controller('admin')
+@Controller('api/v1/admin')
 export class AdminController {
   constructor(private readonly service: AdminService) {}
 

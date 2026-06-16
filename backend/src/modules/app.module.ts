@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { GamesModule } from './games/games.module';
 import { PackagesModule } from './packages/packages.module';
@@ -14,7 +15,21 @@ import { PrismaModule } from '../common/prisma.module';
 import { BotModule } from './bot/bot.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, BotModule, GamesModule, PackagesModule, OrdersModule, WalletsModule, DepositsModule, TransactionsModule, PaymentsModule, AdminModule, SupportModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    PrismaModule,
+    AuthModule,
+    BotModule,
+    GamesModule,
+    PackagesModule,
+    OrdersModule,
+    WalletsModule,
+    DepositsModule,
+    TransactionsModule,
+    PaymentsModule,
+    AdminModule,
+    SupportModule,
+  ],
   controllers: [],
   providers: [],
 })

@@ -44,5 +44,28 @@
     "enter_amount": "Summani kiriting",
     "select_method": "To'lov usulini tanlang",
     "pay_confirm": "Men to'ladim"
+  },
+  "games": {
+    "official_partner": "Rasmiy hamkor",
+    "uid": "Foydalanuvchi ID (UID)",
+    "enter_uid": "UID kiriting",
+    "region": "Region",
+    "select_package": "Paketni tanlang"
+  },
+  "profile_personal": {
+    "title": "Shaxsiy ma'lumotlar",
+    "debug": "Debug",
+    "profile_photo_desc": "Telegram profil rasmi ishlatilmoqda",
+    "name": "Ism",
+    "name_placeholder": "Ismingizni kiriting",
+    "username": "Username",
+    "telegram_id": "Telegram ID",
+    "unknown": "aniqlanmagan",
+    "security_note": "Ma'lumotlaringiz Telegram orqali xavfsiz ulangan. Ismingizni shu yerda o'zgartirishingiz mumkin, qolgan ma'lumotlar avtomatik yangilanadi.",
+    "update": "Ma'lumotlarni yangilash",
+    "connection_success": "Backend ulanishi muvaffaqiyatli!",
+    "connection_failed": "Backendga ulanib bo'lmadi!",
+    "update_success": "Ma'lumotlar muvaffaqiyatli yangilandi!",
+    "update_failed": "Xatolik yuz berdi. Iltimos qaytadan urinib ko'ring."
   }
 }

@@ -9,10 +9,11 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService
   ) {}
-
-  verifyTelegramInitData(initData: string, botToken: string): Record<string, string> {
-    // initData is the raw query string from Telegram WebApp
-    const params = initData.split('&').map(p => {
+verifyTelegramInitData(initData: string, botToken: string): Record<string, string> {
+  console.log('DEBUG: botToken used for verification:', botToken);
+  // initData is the raw query string from Telegram WebApp
+  const params = initData.split('&').map(p => {
+// ... (rest of the file)
       const [k, ...rest] = p.split('=');
       return [k, decodeURIComponent(rest.join('='))];
     });
@@ -25,13 +26,19 @@ export class AuthService {
       .map(([k, v]) => `${k}=${v}`)
       .sort();
     const dataCheckString = dataCheckArray.join('\n');
+    console.log('DEBUG: dataCheckString:', dataCheckString);
 
     const secretKey = crypto.createHash('sha256').update(botToken).digest();
     const hmac = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
+    console.log('DEBUG: hmac:', hmac);
+    console.log('DEBUG: hash:', hash);
 
     // Timing safe compare
     const hashLower = hash.toLowerCase();
-    if (!crypto.timingSafeEqual(Buffer.from(hmac, 'hex'), Buffer.from(hashLower, 'hex'))) {
+    const hmacBuffer = Buffer.from(hmac, 'hex');
+    const hashBuffer = Buffer.from(hashLower, 'hex');
+
+    if (hmacBuffer.length !== hashBuffer.length || !crypto.timingSafeEqual(hmacBuffer, hashBuffer)) {
       throw new UnauthorizedException('Invalid initData signature');
     }
 

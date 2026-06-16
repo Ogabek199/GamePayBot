@@ -5,7 +5,7 @@ import { JwtAuthGuard } from '../../common/guards/jwt.guard';
 import { CurrentUser } from '../../common/decorators/user.decorator';
 
 @UseGuards(JwtAuthGuard)
-@Controller('deposits')
+@Controller('api/v1/deposits')
 export class DepositsController {
   constructor(private readonly service: DepositsService) {}
 

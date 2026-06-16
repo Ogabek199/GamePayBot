@@ -6,6 +6,7 @@ import { User, Smartphone, Hash, Save, ShieldCheck, Loader2 } from 'lucide-react
 import { BackButton } from '../../../components/BackButton';
 import { updateProfile, pingBackend } from '../../../services/api';
 import { toast } from 'react-hot-toast';
+import { useTranslation } from '../../../stores/useTranslation';
 
 // Telegram WebApp interfeysi uchun to'liq tipifikatsiya
 interface TelegramUser {
@@ -23,6 +24,7 @@ interface TelegramWebApp {
 
 export default function PersonalInfoPage() {
   const { user, updateUser } = useAuthStore();
+  const { t } = useTranslation();
   const [mounted, setMounted] = useState(false);
   const [firstName, setFirstName] = useState('');
   const [loading, setLoading] = useState(false);
@@ -81,11 +83,11 @@ export default function PersonalInfoPage() {
   if (!mounted) return null;
 
   return (
-    <main className="min-h-screen animate-fade-in p-4 md:p-6 pb-32 md:pb-8 max-w-4xl mx-auto space-y-8 md:ml-20 lg:ml-64">
+    <main className="min-h-screen animate-fade-in p-4 md:p-6 pb-32 md:pb-8 max-w-4xl mx-auto space-y-8">
       <header className="flex items-center justify-between">
         <BackButton />
-        <h1 className="text-lg font-bold">Shaxsiy ma'lumotlar</h1>
-        <button onClick={handleTestConnection} className="text-[10px] text-muted underline">Debug</button>
+        <h1 className="text-lg font-bold">{t('profile_personal.title')}</h1>
+        <button onClick={handleTestConnection} className="text-[10px] text-muted underline">{t('profile_personal.debug')}</button>
       </header>
 
       {/* Profil rasmi bo'limi */}

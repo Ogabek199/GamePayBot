@@ -31,7 +31,10 @@ export function BottomNav() {
   return (
     <>
       {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-6 left-0 right-0 px-4 z-50 pointer-events-none">
+      <div 
+        className="md:hidden fixed bottom-0 left-0 right-0 px-4 z-50 pointer-events-none bg-gradient-to-t from-bg via-bg to-transparent pt-4"
+        style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))' }}
+      >
         <nav className="w-full max-w-md mx-auto h-16 glass rounded-[9999px] shadow-premium flex items-center justify-around px-4 premium-border pointer-events-auto">
           {navItems.map((item) => {
             const isActive = pathname === item.path;

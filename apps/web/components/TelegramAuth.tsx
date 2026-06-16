@@ -5,37 +5,43 @@ import { useAuthStore } from '../stores/useAuthStore';
 import { loginWithTelegram } from '../services/api';
 
 export default function TelegramAuth() {
-  const { setAuth, token } = useAuthStore();
+  const { setAuth, setAuthenticating } = useAuthStore();
 
   useEffect(() => {
     const initTelegram = async () => {
-      // Check if we are inside Telegram WebApp
-      if (typeof window !== 'undefined' && window.Telegram?.WebApp) {
-        const webapp = window.Telegram.WebApp;
-        webapp.ready();
-        webapp.expand();
+      console.log('AUTO_AUTH: Checking Telegram WebApp...');
 
-        const initData = webapp.initData;
-        const userUnsafe = webapp.initDataUnsafe?.user;
+      if (typeof window === 'undefined' || !window.Telegram?.WebApp) {
+        console.error('AUTO_AUTH: Telegram WebApp not detected.');
+        setAuthenticating(false);
+        return;
+      }
+
+      const webapp = window.Telegram.WebApp;
+      webapp.ready();
+      webapp.expand();
+
+      const initData = webapp.initData;
+      if (!initData) {
+        console.error('AUTO_AUTH: No initData available.');
+        setAuthenticating(false);
+        return;
+      }
+
+      try {
+        console.log('AUTO_AUTH: Attempting automatic login with initData...');
+        const { token, user } = await loginWithTelegram(initData);
         
-        if (initData) {
-          try {
-            // Log user data for debugging (as requested by user's example)
-            if (userUnsafe) {
-              console.log(`Telegram User detected: ID: ${userUnsafe.id}, Username: @${userUnsafe.username}`);
-            }
-
-            const { token: newToken, user } = await loginWithTelegram(initData);
-            setAuth(newToken, user);
-          } catch (error) {
-            console.error('Telegram login failed:', error);
-          }
-        }
+        console.log('AUTO_AUTH: Success, updating store.');
+        setAuth(token, user);
+      } catch (error) {
+        console.error('AUTO_AUTH: Automatic login failed:', error);
+        setAuthenticating(false);
       }
     };
 
     initTelegram();
-  }, [setAuth, token]);
+  }, [setAuth, setAuthenticating]);
 
   return null;
 }

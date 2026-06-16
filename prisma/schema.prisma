@@ -15,56 +15,54 @@ model User {
   photoUrl      String?
   role          String         @default("USER")
   language      String         @default("uz")
-  wallets       Wallet[]
-  orders        Order[]
-  deposits      Deposit[]
-  transactions  Transaction[]
-  notifications Notification[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
+  deposits      Deposit[]
+  notifications Notification[]
+  orders        Order[]
+  transactions  Transaction[]
+  wallets       Wallet?
 }
 
 model Wallet {
   id        String   @id @default(uuid())
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  balance   Decimal  @default("0")
+  userId    String   @unique
+  balance   Decimal  @default(0)
   updatedAt DateTime @updatedAt
-
-  @@unique([userId])
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model PaymentCard {
-  id          String    @id @default(uuid())
-  cardHolder  String
-  cardNumber  String
-  bankName    String
-  isActive    Boolean   @default(true)
-  deposits    Deposit[]
-  createdAt   DateTime  @default(now())
+  id         String    @id @default(uuid())
+  cardHolder String
+  cardNumber String
+  bankName   String
+  isActive   Boolean   @default(true)
+  createdAt  DateTime  @default(now())
+  deposits   Deposit[]
 }
 
 model Deposit {
-  id         String      @id @default(uuid())
-  user       User        @relation(fields: [userId], references: [id])
-  userId     String
-  card       PaymentCard @relation(fields: [cardId], references: [id])
-  cardId     String
-  amount     Decimal
-  status     String      @default("pending") // pending, approved, rejected
-  adminNote  String?
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  id        String      @id @default(uuid())
+  userId    String
+  cardId    String
+  amount    Decimal
+  status    String      @default("pending")
+  adminNote String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  card      PaymentCard @relation(fields: [cardId], references: [id])
+  user      User        @relation(fields: [userId], references: [id])
 }
 
 model Transaction {
   id        String   @id @default(uuid())
-  user      User     @relation(fields: [userId], references: [id])
   userId    String
-  type      String   // deposit, order, refund
+  type      String
   amount    Decimal
-  status    String   // success, failed, pending
+  status    String
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Game {
@@ -74,48 +72,48 @@ model Game {
   logo      String?
   banner    String?
   status    String    @default("active")
-  packages  Package[]
-  orders    Order[]
   createdAt DateTime  @default(now())
+  orders    Order[]
+  packages  Package[]
 }
 
 model Package {
   id        String   @id @default(uuid())
-  game      Game     @relation(fields: [gameId], references: [id])
   gameId    String
   title     String
   amount    Int
   price     Decimal
   image     String?
   status    String   @default("active")
-  orders    Order[]
   createdAt DateTime @default(now())
+  orders    Order[]
+  game      Game     @relation(fields: [gameId], references: [id])
 }
 
 model Order {
   id              String   @id @default(uuid())
-  user            User     @relation(fields: [userId], references: [id])
   userId          String
-  game            Game     @relation(fields: [gameId], references: [id])
   gameId          String
-  package         Package  @relation(fields: [packageId], references: [id])
   packageId       String
   uid             String?
   region          String?
   price           Decimal
   currency        String
-  status          String   @default("pending") // pending, waiting_payment, checking, paid, processing, completed, cancelled, failed
+  status          String   @default("pending")
   paymentMethodId String?
   meta            String?
-  adminNote       String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  adminNote       String?
+  package         Package  @relation(fields: [packageId], references: [id])
+  game            Game     @relation(fields: [gameId], references: [id])
+  user            User     @relation(fields: [userId], references: [id])
 }
 
 model PaymentMethod {
   id      String  @id @default(uuid())
   name    String
-  type    String  // MANUAL_CARD, CLICK, PAYME, UZUM, CRYPTO
+  type    String
   details String?
   active  Boolean @default(true)
 }
@@ -142,28 +140,28 @@ model Admin {
   id        String     @id @default(uuid())
   username  String     @unique
   password  String
-  role      String     @default("ADMIN") // ADMIN, SUPER_ADMIN
-  logs      AdminLog[]
+  role      String     @default("ADMIN")
   createdAt DateTime   @default(now())
+  logs      AdminLog[]
 }
 
 model AdminLog {
   id        String   @id @default(uuid())
-  admin     Admin    @relation(fields: [adminId], references: [id])
   adminId   String
   action    String
   target    String?
   createdAt DateTime @default(now())
+  admin     Admin    @relation(fields: [adminId], references: [id])
 }
 
 model Notification {
   id        String   @id @default(uuid())
-  user      User     @relation(fields: [userId], references: [id])
   userId    String
   title     String
   message   String
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model SupportTicket {

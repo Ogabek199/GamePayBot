@@ -4,15 +4,21 @@ import helmet from 'helmet';
 import * as dotenv from 'dotenv';
 import { AppModule } from './modules/app.module';
 
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+
 dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useGlobalFilters(new AllExceptionsFilter());
   app.use(helmet({
     contentSecurityPolicy: false,
   }));
   app.enableCors({
-    origin: true,
+    origin: (origin, callback) => {
+      // Allow all origins in development
+      callback(null, true);
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });

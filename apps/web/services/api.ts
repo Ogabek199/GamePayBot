@@ -1,23 +1,22 @@
 import axios from 'axios';
+import { useAuthStore } from '../stores/useAuthStore';
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || '/api/v1',
   headers: { 'Content-Type': 'application/json' },
 });
 
 // Request: attach JWT if present
 api.interceptors.request.use((cfg) => {
-  try {
-    const storage = typeof window !== 'undefined' ? localStorage.getItem('gp_auth_storage') : null;
-    if (storage) {
-      const { state } = JSON.parse(storage);
-      if (state && state.token) {
-        cfg.headers = { ...cfg.headers, Authorization: `Bearer ${state.token}` };
-      }
-    }
-  } catch (e) {
-    // ignore
+  const token = useAuthStore.getState().token;
+  
+  if (token) {
+    cfg.headers.Authorization = `Bearer ${token}`;
+    console.log('DEBUG: Authorization header set directly from Zustand:', cfg.url);
+  } else {
+    console.warn('DEBUG: No token found in Zustand store.');
   }
+  
   return cfg;
 });
 
@@ -26,11 +25,12 @@ api.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err.response?.status === 401) {
-       // Optional: handle logout on 401
+       console.error('DEBUG: 401 Unauthorized detected');
     }
     return Promise.reject(err);
   }
 );
+// ... keep the rest of the file exports ...
 
 // Telegram WebApp helper: send initData to backend and store token
 export async function loginWithTelegram(initData: string) {
@@ -51,6 +51,53 @@ export async function updateProfile(data: { firstName: string }) {
   }
 }
 
+export async function fetchOrders() {
+  try {
+    const resp = await api.get('/orders');
+    return resp.data;
+  } catch (error: any) {
+    console.error('Fetch orders failed:', error.message);
+    throw error;
+  }
+}
+
+// ──────────────────────────────────────────────
+// Payment Cards — active manual-transfer cards
+// ──────────────────────────────────────────────
+export async function fetchPaymentCards() {
+  const resp = await api.get('/payments/cards');
+  return resp.data;
+}
+
+// ──────────────────────────────────────────────
+// Deposits — manual card deposit flow
+// ──────────────────────────────────────────────
+export async function createDeposit(amount: number, cardId: string) {
+  const resp = await api.post('/deposits', { amount, cardId });
+  return resp.data;
+}
+
+export async function fetchMyDeposits() {
+  const resp = await api.get('/deposits/me');
+  return resp.data;
+}
+
+// ──────────────────────────────────────────────
+// Wallet — user balance
+// ──────────────────────────────────────────────
+export async function fetchMyWallet() {
+  const resp = await api.get('/wallet/me');
+  return resp.data;
+}
+
+// ──────────────────────────────────────────────
+// Transactions — deposit / order / refund history
+// ──────────────────────────────────────────────
+export async function fetchMyTransactions() {
+  const resp = await api.get('/transactions/me');
+  return resp.data;
+}
+
 export async function pingBackend() {
   try {
     const resp = await api.post('/auth/test-connection');
@@ -65,7 +112,6 @@ export async function pingBackend() {
 export function logout() {
   if (typeof window !== 'undefined') {
     localStorage.removeItem('gp_auth_storage');
-    window.location.href = '/';
   }
 }
 

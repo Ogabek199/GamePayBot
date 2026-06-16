@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/prisma/migrations/20260614185912_init/migration.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/prisma/migrations/20260614213606_extend_schema_for_premium_features/migration.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/prisma/migrations/20260614221124_sync_manual_card_flow/migration.sql" dialect="SQLite" />
+  </component>
+</project>

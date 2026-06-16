@@ -59,9 +59,11 @@ export class DepositsService implements OnModuleInit {
     });
 
     // Notify admin (fire-and-forget — a notification failure must not fail the request).
+    console.log(`DEBUG: Attempting to send admin notification for deposit ${deposit.id}...`);
     this.bot
       .notifyAdminDeposit(deposit)
-      .catch((e) => console.error('notifyAdminDeposit failed:', e?.message));
+      .then(() => console.log(`DEBUG: Admin notification sent for deposit ${deposit.id}`))
+      .catch((e) => console.error(`ERROR: notifyAdminDeposit failed for ${deposit.id}:`, e?.message, e?.stack));
 
     return deposit;
   }

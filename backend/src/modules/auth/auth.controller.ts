@@ -3,15 +3,20 @@ import { AuthService } from './auth.service';
 import { TelegramAuthDto } from './dto/telegram-auth.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt.guard';
 import { CurrentUser } from '../../common/decorators/user.decorator';
+import { ConfigService } from '@nestjs/config';
 
-@Controller('auth')
+@Controller('api/v1/auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService
+  ) {}
 
   @Post('telegram')
   async telegram(@Body() body: TelegramAuthDto) {
-    const botToken = process.env.BOT_TOKEN || '';
-    const result = await this.authService.telegramLogin(body.initData, botToken);
+    const botToken = this.configService.get<string>('BOT_TOKEN');
+    console.log('DEBUG: Bot token from config:', botToken);
+    const result = await this.authService.telegramLogin(body.initData, botToken || '');
     return result;
   }
 

@@ -24,19 +24,12 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
     <AnimatePresence>
       {isOpen && (
         <>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <div
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] transition-opacity duration-300"
           />
-          <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed bottom-0 left-0 right-0 glass rounded-t-[3xl] z-[101] max-w-md mx-auto p-6 space-y-6 premium-border"
+          <div
+            className="fixed bottom-0 left-0 right-0 glass rounded-t-[3xl] z-[101] max-w-md mx-auto p-6 space-y-6 premium-border animate-slide-up"
           >
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold">{title}</h3>
@@ -47,7 +40,7 @@ export function BottomSheet({ isOpen, onClose, title, children }: BottomSheetPro
             <div className="pb-16 max-h-[70vh] overflow-y-auto hide-scrollbar">
               {children}
             </div>
-          </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>

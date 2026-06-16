@@ -5,7 +5,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { CurrentUser } from '../../common/decorators/user.decorator';
 
 @UseGuards(JwtAuthGuard)
-@Controller('orders')
+@Controller('api/v1/orders')
 export class OrdersController {
   constructor(private readonly service: OrdersService) {}
 

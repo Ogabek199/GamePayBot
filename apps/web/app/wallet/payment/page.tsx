@@ -6,21 +6,51 @@ import { ChevronLeft, Clock, Copy, CheckCircle2, AlertTriangle, ShieldCheck } fr
 import { motion, AnimatePresence } from 'framer-motion';
 import { BackButton } from '../../../components/BackButton';
 
+import { fetchPaymentCards, createDeposit, loginWithTelegram } from '../../../services/api';
+import { useAuthStore } from '../../../stores/useAuthStore';
+
 function PaymentContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const amount = searchParams.get('amount') || '0';
   const cardType = searchParams.get('card') || '1';
+  const { token, setAuth } = useAuthStore();
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
 
   const [timeLeft, setTimeLeft] = useState(300);
   const [copied, setCopied] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cardData, setCardData] = useState<any>(null);
+  const [isLoadingCard, setIsLoadingCard] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   useEffect(() => {
     if (timeLeft <= 0) return;
     const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
     return () => clearInterval(timer);
   }, [timeLeft]);
+
+  useEffect(() => {
+    setIsLoadingCard(true);
+    setErrorMsg(null);
+    fetchPaymentCards()
+      .then((cards) => {
+        const found = cards.find((c: any) => c.id === cardType);
+        if (found) {
+          setCardData(found);
+        } else {
+          setErrorMsg("To'lov kartasi topilmadi");
+        }
+      })
+      .catch((err) => {
+        setErrorMsg("Karta ma'lumotlarini yuklashda xatolik yuz berdi");
+        console.error('Fetch card error:', err);
+      })
+      .finally(() => {
+        setIsLoadingCard(false);
+      });
+  }, [cardType]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -35,21 +65,77 @@ function PaymentContent() {
   };
 
   const handlePaid = async () => {
+    if (isAuthenticating) return;
+    let currentToken = token;
+    
+    // Check if token exists in session storage directly as a fallback
+    if (!currentToken) {
+        const storedAuth = sessionStorage.getItem('gp_auth_storage');
+        if (storedAuth) {
+            currentToken = JSON.parse(storedAuth).state.token;
+        }
+    }
+
+    if (!currentToken) {
+        setIsAuthenticating(true);
+        console.log('DEBUG: Token missing, attempting re-auth via Telegram...');
+        const initData = window.Telegram?.WebApp?.initData;
+        if (!initData) {
+            setErrorMsg("Siz avtorizatsiyadan o'tmagansiz. Iltimos, Telegram orqali qaytadan kiring.");
+            setIsAuthenticating(false);
+            return;
+        }
+        try {
+            const { token: newToken, user } = await loginWithTelegram(initData);
+            setAuth(newToken, user);
+            currentToken = newToken;
+            console.log('DEBUG: Re-auth successful.');
+        } catch (err) {
+            console.error('Re-auth failed:', err);
+            setErrorMsg("Avtorizatsiyadan o'tishda xatolik yuz berdi. Iltimos, qaytadan urinib ko'ring.");
+            setIsAuthenticating(false);
+            return;
+        } finally {
+            setIsAuthenticating(false);
+        }
+    }
     setIsSubmitting(true);
+    setErrorMsg(null);
     try {
-      // API CALL Simulation
-      // await api.post('/deposits', { amount, cardId: cardType });
+      await createDeposit(Number(amount), cardType);
+      setSuccessMsg("To'lov so'rovi qabul qilindi. Admin tomonidan tekshirilmoqda.");
       setTimeout(() => {
-        setIsSubmitting(false);
         router.push('/history');
-      }, 1500);
-    } catch (e) {
+      }, 3000);
+    } catch (err: any) {
+      console.error(err);
+      const apiMessage = err.response?.data?.message || err.message || "Xatolik yuz berdi";
+      setErrorMsg(Array.isArray(apiMessage) ? apiMessage[0] : apiMessage);
+    } finally {
       setIsSubmitting(false);
     }
   };
 
+  if (isLoadingCard) {
+    return (
+      <main className="min-h-screen p-4 md:p-6 max-w-4xl mx-auto flex flex-col items-center justify-center space-y-4">
+        <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin animate-fade-in"></div>
+        <p className="text-muted text-sm">Karta ma'lumotlari yuklanmoqda...</p>
+      </main>
+    );
+  }
+
+  if (errorMsg && !cardData) {
+    return (
+      <main className="min-h-screen p-4 md:p-6 max-w-4xl mx-auto flex flex-col items-center justify-center space-y-4">
+        <BackButton />
+        <p className="text-danger font-bold text-center text-sm">{errorMsg}</p>
+      </main>
+    );
+  }
+
   return (
-    <main className="min-h-screen animate-fade-in p-4 md:p-6 pb-32 md:pb-8 max-w-4xl mx-auto space-y-6 md:ml-20 lg:ml-64">
+    <main className="min-h-screen animate-fade-in p-4 md:p-6 pb-32 md:pb-8 max-w-4xl mx-auto space-y-6 flex flex-col">
       <header className="flex items-center justify-between">
         <BackButton />
         <h1 className="text-lg font-bold">To'lov ma'lumotlari</h1>
@@ -83,6 +169,25 @@ function PaymentContent() {
         </div>
       </section>
 
+      {/* Error and Success Alert boxes */}
+      {errorMsg && (
+        <section className="bg-danger/10 border border-danger/20 rounded-2xl p-4 flex items-start space-x-3">
+          <AlertTriangle className="text-danger flex-shrink-0 animate-bounce" size={20} />
+          <p className="text-[11px] text-danger-foreground font-medium leading-relaxed">
+            <span className="font-bold uppercase tracking-tighter">Xatolik:</span> {errorMsg}
+          </p>
+        </section>
+      )}
+
+      {successMsg && (
+        <section className="bg-success/10 border border-success/20 rounded-2xl p-4 flex items-start space-x-3 animate-pulse">
+          <CheckCircle2 className="text-success flex-shrink-0" size={20} />
+          <p className="text-[11px] text-success-foreground font-medium leading-relaxed">
+            <span className="font-bold uppercase tracking-tighter">Muvaffaqiyatli:</span> {successMsg}
+          </p>
+        </section>
+      )}
+
       {/* Warning Card */}
       <section className="bg-danger/10 border border-danger/20 rounded-2xl p-4 flex items-start space-x-3">
         <AlertTriangle className="text-danger flex-shrink-0" size={20} />
@@ -97,9 +202,9 @@ function PaymentContent() {
         
         <div className="space-y-3">
           {[
-            { label: 'Karta raqami', value: '8600 1234 5678 9012', id: 'card' },
-            { label: 'Karta egasi', value: 'OGABEK O.', id: 'holder' },
-            { label: 'Bank nomi', value: 'AGROBANK', id: 'bank' },
+            { label: 'Karta raqami', value: cardData?.cardNumber || '', id: 'card' },
+            { label: 'Karta egasi', value: cardData?.cardHolder || '', id: 'holder' },
+            { label: 'Bank nomi', value: cardData?.bankName || '', id: 'bank' },
           ].map((item) => (
             <div key={item.id} className="glass-card p-4 md:p-5 flex items-center justify-between premium-border group hover:bg-white/10 transition-colors">
               <div className="space-y-1 flex-1 min-w-0">
@@ -118,12 +223,12 @@ function PaymentContent() {
       </section>
 
       {/* Action Button */}
-      <div className="fixed bottom-32 md:bottom-8 left-0 right-0 px-4 md:px-6 z-40 pointer-events-none md:ml-20 lg:ml-64">
-        <div className="max-w-2xl mx-auto pointer-events-auto">
+      <div className="fixed bottom-24 md:bottom-4 left-0 right-0 px-4 md:px-6 z-30 pointer-events-none">
+        <div className="max-w-4xl mx-auto pointer-events-auto">
           <button
             onClick={handlePaid}
-            disabled={isSubmitting}
-            className={`w-full h-14 md:h-16 rounded-[2rem] bg-success text-white font-bold text-lg shadow-[0_8px_32px_rgba(0,200,83,0.3)] flex items-center justify-center space-x-3 active:scale-95 transition-all ${isSubmitting ? 'opacity-70' : ''}`}
+            disabled={isSubmitting || !!successMsg}
+            className={`w-full h-14 md:h-16 rounded-[2rem] bg-success text-white font-bold text-lg shadow-[0_8px_32px_rgba(0,200,83,0.3)] flex items-center justify-center space-x-3 active:scale-95 transition-all ${isSubmitting || successMsg ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
             {isSubmitting ? (
               <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -137,19 +242,14 @@ function PaymentContent() {
         </div>
       </div>
 
-      <AnimatePresence>
-        {copied && (
-          <motion.div 
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
-            className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[60] bg-success text-white px-6 py-3 rounded-2xl font-bold text-sm shadow-xl flex items-center space-x-2"
-          >
-            <CheckCircle2 size={18} />
-            <span>{copied} nusxalandi</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {copied && (
+        <div 
+          className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[60] bg-success text-white px-6 py-3 rounded-2xl font-bold text-sm shadow-xl flex items-center space-x-2 transition-all duration-300 animate-fade-in"
+        >
+          <CheckCircle2 size={18} />
+          <span>{copied} nusxalandi</span>
+        </div>
+      )}
     </main>
   );
 }

@@ -1,4 +1,5 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Telegraf } from 'telegraf';
 
 type DepositAction = 'approve' | 'reject';
@@ -10,22 +11,32 @@ export class BotService implements OnModuleInit {
   // Lazily-resolved handler registered by DepositsService to keep the modules decoupled.
   private depositActionHandler: DepositActionHandler | null = null;
 
+  constructor(private configService: ConfigService) {}
+
   registerDepositActionHandler(handler: DepositActionHandler) {
     this.depositActionHandler = handler;
   }
 
   async onModuleInit() {
-    const token = process.env.BOT_TOKEN;
+    const token = this.configService.get<string>('BOT_TOKEN');
+    const adminChatId = this.configService.get<string>('ADMIN_CHAT_ID');
+
     if (!token || token === 'your_telegram_bot_token_here') {
       console.error('BOT_TOKEN is missing or invalid! Bot not started.');
       return;
+    }
+
+    if (!adminChatId) {
+      console.warn('ADMIN_CHAT_ID is not set! Admin notifications will not work.');
+    } else {
+      console.log(`Admin notifications will be sent to: ${adminChatId}`);
     }
 
     this.bot = new Telegraf(token);
     this.setupHandlers();
 
     try {
-      const webAppUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+      const webAppUrl = this.configService.get<string>('NEXT_PUBLIC_BASE_URL') || 'http://localhost:3000';
 
       await this.bot.telegram.setMyCommands([
         { command: 'start', description: 'Botni ishga tushirish' },
@@ -35,13 +46,18 @@ export class BotService implements OnModuleInit {
         { command: 'help', description: 'Yordam va qo\'llab-quvvatlash' },
       ]);
 
-      await this.bot.telegram.setChatMenuButton({
-        menuButton: {
-          type: 'web_app',
-          text: 'Ilovani ochish',
-          web_app: { url: webAppUrl },
-        },
-      });
+      try {
+        await this.bot.telegram.setChatMenuButton({
+          menuButton: {
+            type: 'web_app',
+            text: 'Open',
+            web_app: { url: webAppUrl },
+          },
+        });
+      } catch (menuError) {
+        // @ts-ignore
+        console.warn('Could not set Chat Menu Button (likely due to non-HTTPS URL in dev):', menuError.message);
+      }
 
       await this.bot.launch();
       console.log('Telegram Bot started successfully with commands');
@@ -52,9 +68,13 @@ export class BotService implements OnModuleInit {
 
   /** Send a new deposit request to the admin chat with Approve/Reject buttons. */
   async notifyAdminDeposit(deposit: any) {
-    const adminChatId = process.env.ADMIN_CHAT_ID;
-    if (!this.bot || !adminChatId) {
-      if (!adminChatId) console.error('ADMIN_CHAT_ID is not set — admin notification skipped.');
+    const adminChatId = this.configService.get<string>('ADMIN_CHAT_ID');
+    if (!this.bot) {
+      console.error('ERROR: Bot is not initialized. Cannot send admin notification.');
+      return;
+    }
+    if (!adminChatId) {
+      console.error('ERROR: ADMIN_CHAT_ID is not set in configuration. Admin notification skipped.');
       return;
     }
 
@@ -88,40 +108,75 @@ export class BotService implements OnModuleInit {
 
   private setupHandlers() {
     if (!this.bot) return;
-    const webAppUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const webAppUrl = this.configService.get<string>('NEXT_PUBLIC_BASE_URL') || 'https://localhost:3000';
+    // Telegram only allows HTTPS for WebApp buttons. 
+    const isHttps = webAppUrl.startsWith('https://');
+    
+    if (!isHttps) {
+      console.error('CRITICAL: WebApp URL must use HTTPS. Current URL:', webAppUrl);
+    }
 
-    this.bot.start((ctx) => {
-      ctx.replyWithMarkdownV2(`*Xush kelibsiz, ${ctx.from.first_name || 'foydalanuvchi'}\\!* 🎮\n\nGang Pay orqali o'yinlar uchun paketlarni tez va arzon sotib oling\\.`, {
-        reply_markup: {
+    this.bot.start(async (ctx) => {
+      try {
+        const replyMarkup = isHttps ? {
           inline_keyboard: [
             [{ text: '🚀 Do\'konni ochish', web_app: { url: webAppUrl } }],
           ],
-        },
-      });
+        } : {
+          inline_keyboard: [
+            [{ text: '🔗 Brauzerda ochish', url: webAppUrl }],
+          ],
+        };
+
+        await ctx.replyWithMarkdownV2(`*Xush kelibsiz, ${ctx.from.first_name || 'foydalanuvchi'}\\!* 🎮\n\nGang Pay orqali o'yinlar uchun paketlarni tez va arzon sotib oling\\.`, {
+          reply_markup: replyMarkup,
+        });
+      } catch (e) {
+        console.error('Bot start reply failed:', (e as Error).message);
+        await ctx.reply(`Xush kelibsiz! Ilovani ochish uchun bosing: ${webAppUrl}`);
+      }
     });
 
-    this.bot.command('shop', (ctx) => {
-      ctx.reply('Savdo qilish uchun pastdagi tugmani bosing:', {
-        reply_markup: {
-          inline_keyboard: [[{ text: '🛍 Do\'kon', web_app: { url: webAppUrl } }]],
-        },
-      });
+    this.bot.command('shop', async (ctx) => {
+      try {
+        if (isHttps) {
+          await ctx.reply('Savdo qilish uchun pastdagi tugmani bosing:', {
+            reply_markup: {
+              inline_keyboard: [[{ text: '🛍 Do\'kon', web_app: { url: webAppUrl } }]],
+            },
+          });
+        } else {
+          await ctx.reply(`Savdo qilish uchun brauzer orqali kiring:\n${webAppUrl}`);
+        }
+      } catch (e) {
+        await ctx.reply(`Do'kon: ${webAppUrl}`);
+      }
     });
 
     this.bot.command('profile', (ctx) => {
-      ctx.reply('Profil ma\'lumotlarini va balansingizni ko\'rish uchun ilovani oching:', {
-        reply_markup: {
-          inline_keyboard: [[{ text: '👤 Profilim', web_app: { url: `${webAppUrl}/profile` } }]],
-        },
-      });
+      const url = `${webAppUrl}/profile`;
+      if (isHttps) {
+        ctx.reply('Profil ma\'lumotlarini ko\'rish uchun ilovani oching:', {
+          reply_markup: {
+            inline_keyboard: [[{ text: '👤 Profilim', web_app: { url } }]],
+          },
+        });
+      } else {
+        ctx.reply(`Profil uchun havola:\n${url}`);
+      }
     });
 
     this.bot.command('orders', (ctx) => {
-      ctx.reply('Barcha buyurtmalaringiz ro\'yxati ilovada:', {
-        reply_markup: {
-          inline_keyboard: [[{ text: '📋 Buyurtmalarim', web_app: { url: `${webAppUrl}/history` } }]],
-        },
-      });
+      const url = `${webAppUrl}/history`;
+      if (isHttps) {
+        ctx.reply('Barcha buyurtmalaringiz ro\'yxati ilovada:', {
+          reply_markup: {
+            inline_keyboard: [[{ text: '📋 Buyurtmalarim', web_app: { url } }]],
+          },
+        });
+      } else {
+        ctx.reply(`Buyurtmalar uchun havola:\n${url}`);
+      }
     });
 
     this.bot.help((ctx) => {
