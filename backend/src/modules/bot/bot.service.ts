@@ -29,7 +29,9 @@ export class BotService implements OnModuleInit {
     if (!adminChatId) {
       console.warn('ADMIN_CHAT_ID is not set! Admin notifications will not work.');
     } else {
-      console.log(`Admin notifications will be sent to: ${adminChatId}`);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`Admin notifications will be sent to: ${adminChatId}`);
+      }
     }
 
     this.bot = new Telegraf(token);
@@ -60,7 +62,9 @@ export class BotService implements OnModuleInit {
       }
 
       await this.bot.launch();
-      console.log('Telegram Bot started successfully with commands');
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('Telegram Bot started successfully with commands');
+      }
     } catch (error) {
       console.error('Error starting Telegram Bot:', error);
     }
