@@ -15,35 +15,12 @@ const popularGames = [
 ];
 
 import { useTranslation } from '../stores/useTranslation';
-import { fetchMyWallet, fetchMyDeposits } from '../services/api';
 
 function Home() {
-  const {user, isAuthenticating} = useAuthStore();
-  const {t} = useTranslation();
-  
+  const { user, isAuthenticating } = useAuthStore();
+  const { t } = useTranslation();
   const [balance, setBalance] = useState<number>(0);
   const [todayTopup, setTodayTopup] = useState<number>(0);
-
-  useEffect(() => {
-    if (user) {
-      Promise.all([
-        fetchMyWallet().catch(() => ({ balance: 0 })),
-        fetchMyDeposits().catch(() => [])
-      ]).then(([walletData, depositsData]) => {
-        setBalance(Number(walletData?.balance || 0));
-        const today = new Date();
-        const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        const sumToday = depositsData
-          .filter((d: any) => d.status === 'approved' && new Date(d.createdAt) >= startOfToday)
-          .reduce((sum: number, d: any) => sum + Number(d.amount), 0);
-        setTodayTopup(sumToday);
-      }).catch((e) => {
-        console.error('Error fetching home data:', e);
-        setBalance(0);
-        setTodayTopup(0);
-      });
-    }
-  }, [user]);
 
   if (isAuthenticating) {
     return (
@@ -56,176 +33,116 @@ function Home() {
   if (!user) {
     return (
         <div className="min-h-screen flex items-center justify-center p-4 text-center">
-          <p className="text-muted">{t('auth.auth_failed')}</p>
+          <p className="text-muted">Botda ro'yxatdan o'tish kerak. /start buyrug'ini bajaring.</p>
         </div>
     );
   }
 
-  // @ts-ignore
   return (
-      <main
-          className="min-h-screen animate-fade-in p-4 md:p-6 pb-32 md:pb-8 space-y-8 w-full max-w-4xl mx-auto">
+      <main className="min-h-screen animate-fade-in p-4 md:p-6 pb-32 md:pb-8 space-y-8 w-full max-w-4xl mx-auto">
         {/* User Welcome Card */}
         <section className="flex items-center justify-between">
           <div className="flex items-center space-x-3 flex-1">
             <div className="relative flex-shrink-0">
-              <div
-                  className="w-14 h-14 md:w-16 md:h-16 rounded-full border-2 border-primary/50 overflow-hidden bg-card">
+              <div className="w-14 h-14 md:w-16 md:h-16 rounded-full border-2 border-primary/50 overflow-hidden bg-card">
                 {user?.photoUrl && user.photoUrl.trim() ? (
                     <img src={user.photoUrl} alt="User" className="w-full h-full object-cover" onError={(e) => {
                       (e.target as any).style.display = 'none';
                     }}/>
-                ) : (
-                    <div
-                        className="w-full h-full flex items-center justify-center text-xl md:text-2xl font-bold bg-primary/10 text-primary">
-                      {user?.firstName?.charAt(0) || 'U'}
-                    </div>
-                )}
-              </div>
-              <div
-                  className="absolute -bottom-1 -right-1 bg-primary text-bg rounded-full p-1 shadow-lg border-2 border-bg">
-                <Crown size={12} fill="currentColor"/>
+                ) : null}
               </div>
             </div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center space-x-1">
-                <span className="text-muted text-xs">{t('common.welcome')}</span>
-              </div>
-              <h2 className="text-lg md:text-xl font-bold leading-tight truncate">
-                {user?.firstName || 'Foydalanuvchi'}
-              </h2>
+              <p className="text-muted text-[10px] font-bold uppercase tracking-widest">Xush kelibsiz,</p>
+              <h1 className="text-lg md:text-xl font-black truncate">{user?.firstName || user?.username || 'Foydalanuvchi'}</h1>
             </div>
           </div>
-          <Link
-              href="/profile"
-              className="w-10 h-10 rounded-full glass flex items-center justify-center text-muted hover:text-white transition-colors flex-shrink-0">
-            <ChevronRight size={20}/>
-          </Link>
         </section>
 
-        {/* Balance Card */}
-        <section className="relative group">
-          <div
-              className="absolute -inset-1 bg-gradient-to-r from-primary to-secondary rounded-[2rem] md:rounded-[3rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
-          <div
-              className="relative bg-premium-card rounded-[2rem] md:rounded-[3rem] p-6 md:p-8 border border-white/5 overflow-hidden shadow-premium">
-            {/* Background Decorative Circles */}
-            <div className="absolute top-[-20%] right-[-10%] w-32 h-32 bg-primary/20 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-[-20%] left-[-10%] w-24 h-24 bg-secondary/10 rounded-full blur-2xl"></div>
-
-            <div className="flex flex-col md:flex-row justify-between items-start relative z-10 gap-4">
-              <div className="space-y-1 flex-1">
-                <p className="text-muted text-xs font-medium uppercase tracking-wider">{t('wallet.total_balance')}</p>
-                <div className="flex items-baseline space-x-1 flex-wrap">
-                  <h3 className="text-4xl md:text-5xl font-extrabold tracking-tight">
-                    {balance.toLocaleString('ru-RU')}
-                  </h3>
-                  <span className="text-primary font-bold text-lg">{t('common.uzs')}</span>
-                </div>
-              </div>
-              <div
-                  className="bg-white/5 px-3 py-1.5 rounded-full border border-white/10 backdrop-blur-md flex-shrink-0">
-              <span className="text-[10px] font-bold text-primary flex items-center space-x-1">
-                <Crown size={10} className="mr-1"/> {t('profile.gold').toUpperCase()}
-              </span>
-              </div>
+        {/* Wallet Balance Card */}
+        <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+            className="bg-gradient-to-br from-primary/20 to-primary/5 rounded-[2.5rem] md:rounded-[3rem] p-6 md:p-8 border border-primary/20 shadow-premium relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl"></div>
+          <div className="relative z-10">
+            <p className="text-muted text-[10px] font-bold uppercase tracking-widest mb-2">Sizning balansingiz</p>
+            <div className="flex items-end space-x-2 mb-6">
+              <h2 className="text-4xl md:text-5xl font-black text-primary">{balance.toLocaleString()}</h2>
+              <span className="text-xl md:text-2xl font-bold text-primary/80 mb-2">UZS</span>
             </div>
-
-            <div
-                className="mt-8 md:mt-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
-              <div className="space-y-0.5 flex-1">
-                <p className="text-[10px] text-muted font-bold uppercase">{t('common.balance')} {t('common.topup').toLowerCase()}</p>
-                <p className="text-sm md:text-base font-semibold">+ {todayTopup.toLocaleString('ru-RU')} {t('common.uzs')} bugun</p>
-              </div>
-              <Link
-                  href="/wallet/deposit"
-                  className="btn-gold h-12 w-12 md:h-14 md:w-14 !p-0 !rounded-2xl flex-shrink-0"
-              >
-                <Plus size={24} strokeWidth={3}/>
+            <div className="grid grid-cols-2 gap-4">
+              <Link href="/wallet/deposit" className="flex items-center justify-center space-x-2 h-12 md:h-14 rounded-[1.5rem] bg-gold-gradient text-bg font-bold shadow-gold hover:shadow-gold/50 transition-all active:scale-95">
+                <Plus size={20} />
+                <span>To'ldirish</span>
+              </Link>
+              <Link href="/wallet" className="flex items-center justify-center space-x-2 h-12 md:h-14 rounded-[1.5rem] glass border border-primary/30 font-bold text-primary hover:bg-primary/10 transition-all active:scale-95">
+                <ChevronRight size={20} />
+                <span>Hamyon</span>
               </Link>
             </div>
           </div>
-        </section>
+        </motion.section>
 
-        {/* Banner Carousel (Placeholder) */}
-        <section className="h-40 rounded-3xl overflow-hidden glass premium-border relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/40 to-purple-600/40 animate-pulse"></div>
-          <div className="absolute inset-0 flex flex-col justify-center px-6">
-            <span
-                className="bg-primary/20 text-primary text-[10px] font-bold py-1 px-2 rounded w-fit mb-2">HOT OFFER</span>
-            <h3 className="text-xl font-bold max-w-[60%]">PUBG Mobile UC bo'yicha katta chegirma!</h3>
-            <p className="text-xs text-muted mt-1">Hozir sotib oling va 10% bonusga ega bo'ling</p>
-          </div>
-        </section>
-
-        {/* Popular Games Section */}
-        <section className="space-y-6">
-          <div className="flex items-center justify-between px-1">
-            <h3 className="text-xl md:text-2xl font-bold">{t('home.popular_games')}</h3>
+        {/* Popular Games */}
+        <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <p className="text-muted text-[10px] font-bold uppercase tracking-widest">Mashhur o'yinlar</p>
+              <h3 className="text-lg font-black">O'yin tanlang</h3>
+            </div>
+            <Link href="#" className="text-primary text-[10px] font-bold uppercase underline hover:text-primary/80">
+              Barchasi →
+            </Link>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
             {popularGames.map((game) => (
-                <Link key={game.id} href={`/games/${game.slug}`} className="block group">
-                  <div
-                      className="relative aspect-square rounded-3xl overflow-hidden bg-gradient-to-br from-card to-card/50 border border-white/10 shadow-lg group-hover:border-primary/50 transition-all duration-300 transform group-hover:-translate-y-1">
-                    <img src={game.image} alt={game.name} className="w-full h-full object-cover p-6 transition-transform duration-500 group-hover:scale-110" onError={(e) => {
-                      (e.target as any).style.display = 'none';
-                    }}/>
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <span className="text-white font-bold text-sm bg-primary px-3 py-1 rounded-full">Sotib olish</span>
+                <motion.div key={game.id} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Link href={`/games/${game.slug}`} className="relative group overflow-hidden rounded-[2rem] aspect-square block">
+                    <img src={game.image} alt={game.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"/>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-3">
+                      <p className="text-white font-bold text-xs line-clamp-2">{game.name}</p>
                     </div>
-                  </div>
-                  <p className="text-[12px] font-bold text-center mt-3 group-hover:text-primary transition-colors line-clamp-1">
-                    {game.name}
-                  </p>
-                </Link>
+                  </Link>
+                </motion.div>
             ))}
           </div>
-        </section>
+        </motion.section>
 
-        {/* Premium Features Section */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-gradient-to-r from-primary/20 to-secondary/20 p-6 rounded-3xl border border-white/10 flex items-center gap-4">
-            <div className="p-3 bg-primary/20 rounded-full text-primary">
-              <Crown size={24} />
-            </div>
+        {/* Stats Cards */}
+        <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+            className="grid grid-cols-2 gap-4 md:gap-6">
+          <div className="glass-card p-5 md:p-6 rounded-[2rem] border border-primary/10 text-center">
+            <p className="text-muted text-[10px] font-bold uppercase tracking-widest mb-2">Bugungi to'lovlar</p>
+            <h3 className="text-2xl md:text-3xl font-black text-primary">{todayTopup.toLocaleString()}</h3>
+            <p className="text-[10px] text-muted mt-2">UZS</p>
+          </div>
+          <div className="glass-card p-5 md:p-6 rounded-[2rem] border border-primary/10 text-center">
+            <p className="text-muted text-[10px] font-bold uppercase tracking-widest mb-2">Tasdiqlanmagan</p>
+            <h3 className="text-2xl md:text-3xl font-black text-yellow-500">0</h3>
+            <p className="text-[10px] text-muted mt-2">So'rov</p>
+          </div>
+        </motion.section>
+
+        {/* Features */}
+        <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
+            className="space-y-3">
+          <div className="flex items-start space-x-3 p-4 md:p-5 rounded-xl bg-white/5 border border-white/5 hover:border-primary/20 transition-colors">
+            <Crown className="text-primary flex-shrink-0 mt-1" size={20} />
             <div>
-              <h4 className="font-bold text-lg">Premium Obuna</h4>
-              <p className="text-sm text-muted">Eksklyuziv bonuslar va chegirmalar.</p>
+              <p className="font-bold text-sm">Premium to'lovlar</p>
+              <p className="text-[10px] text-muted">Tezroq ishlash uchun premium xizmatdan foydalaning</p>
             </div>
           </div>
-          <div className="bg-card p-6 rounded-3xl border border-white/10 flex items-center gap-4">
-            <div className="p-3 bg-white/5 rounded-full text-white">
-              <ShieldCheck size={24} />
-            </div>
+          <div className="flex items-start space-x-3 p-4 md:p-5 rounded-xl bg-white/5 border border-white/5 hover:border-primary/20 transition-colors">
+            <ShieldCheck className="text-primary flex-shrink-0 mt-1" size={20} />
             <div>
-              <h4 className="font-bold text-lg">Xavfsiz Tranzaksiyalar</h4>
-              <p className="text-sm text-muted">100% kafolatlangan va tezkor.</p>
+              <p className="font-bold text-sm">Xavfsiz to'lovlar</p>
+              <p className="text-[10px] text-muted">Barcha to'lovlar encrypted va xavfsizdir</p>
             </div>
           </div>
-        </section>
+        </motion.section>
       </main>
   );
 }
 
-export default Home
-
-function Wallet({ size }: { size: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
-      <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
-      <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
-    </svg>
-  );
-}
-
-function Clock({ size }: { size: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <polyline points="12 6 12 12 16 14" />
-    </svg>
-  );
-}
+export default Home;

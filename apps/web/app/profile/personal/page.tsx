@@ -8,21 +8,8 @@ import { updateProfile, pingBackend } from '../../../services/api';
 import { toast } from 'react-hot-toast';
 import { useTranslation } from '../../../stores/useTranslation';
 
-interface TelegramUser {
-  id: number;
-  username?: string;
-  first_name: string;
-  photo_url?: string;
-}
-
-interface TelegramWebApp {
-  initDataUnsafe?: {
-    user?: TelegramUser;
-  };
-}
-
 export default function PersonalInfoPage() {
-  const { user, updateUser } = useAuthStore();
+  const { user } = useAuthStore();
   const { t } = useTranslation();
   const [firstName, setFirstName] = useState('');
   const [loading, setLoading] = useState(false);
@@ -30,27 +17,14 @@ export default function PersonalInfoPage() {
 
   useEffect(() => {
     try {
-      if (user && Object.keys(user).length > 0) {
-        setFirstName(user.firstName || '');
-      } else if (typeof window !== 'undefined') {
-        const tg = (window as any).Telegram?.WebApp as TelegramWebApp | undefined;
-        const tgUser = tg?.initDataUnsafe?.user;
-
-        if (tgUser) {
-          setFirstName(tgUser.first_name || '');
-          updateUser({
-            telegramId: tgUser.id.toString(),
-            username: tgUser.username || '',
-            firstName: tgUser.first_name,
-            photoUrl: user?.photoUrl || tgUser.photo_url || ''
-          });
-        }
+      if (user?.firstName) {
+        setFirstName(user.firstName);
       }
     } catch (err) {
       console.error('Error in personal page effect:', err);
       setError('Sahifani yuklashda xatolik');
     }
-  }, [user, updateUser]);
+  }, []);
 
   const handleTestConnection = async () => {
     try {
@@ -74,8 +48,7 @@ export default function PersonalInfoPage() {
     setLoading(true);
     setError(null);
     try {
-      const updatedUser = await updateProfile({ firstName: firstName.trim() });
-      updateUser(updatedUser);
+      await updateProfile({ firstName: firstName.trim() });
       toast.success('Ma\'lumotlar muvaffaqiyatli yangilandi!');
     } catch (error) {
       console.error('Update failed:', error);
