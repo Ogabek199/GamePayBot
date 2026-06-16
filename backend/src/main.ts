@@ -2,11 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import * as dotenv from 'dotenv';
+import * as path from 'path';
 import { AppModule } from './modules/app.module';
 
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,7 +16,7 @@ async function bootstrap() {
     contentSecurityPolicy: false,
   }));
   app.enableCors({
-    origin: (origin, callback) => {
+    origin: (origin: any, callback: (arg0: null, arg1: boolean) => void) => {
       // Allow all origins in development
       callback(null, true);
     },
@@ -23,11 +24,10 @@ async function bootstrap() {
     credentials: true,
   });
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
-  const port = process.env.PORT ? Number(process.env.PORT) : 4000;
+   const port = 4000;
   await app.listen(port, '0.0.0.0');
   if (process.env.NODE_ENV !== 'production') {
     console.log(`Backend is running on: http://localhost:${port}`);
-    console.log(`For mobile devices, use: http://${require('os').networkInterfaces()['en0']?.[1]?.address || 'YOUR_IP'}:${port}`);
   }
 }
 

@@ -1,8 +1,8 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '../jwt.service';
+import {CanActivate, ExecutionContext, Injectable, UnauthorizedException} from '@nestjs/common';
+import {JwtService} from '../jwt.service';
 
 @Injectable()
-export class JwtAuthGuard implements CanActivate {
+class JwtAuthGuard implements CanActivate {
   constructor(private jwtService: JwtService) {}
 
   canActivate(context: ExecutionContext) {
@@ -10,8 +10,6 @@ export class JwtAuthGuard implements CanActivate {
     const authHeader = req.headers['authorization'] || req.headers['Authorization'];
     
     if (process.env.NODE_ENV !== 'production') {
-      console.log('JWT_DEBUG: Incoming headers:', req.headers);
-      console.log('JWT_DEBUG: Authorization header:', authHeader);
     }
 
     let token: string | undefined;
@@ -27,8 +25,7 @@ export class JwtAuthGuard implements CanActivate {
     }
     
     try {
-        const payload = this.jwtService.verify(token);
-        req.user = payload;
+        req.user = this.jwtService.verify(token);
         return true;
     } catch (e) {
         console.error('JWT_DEBUG: Token verification failed:', e);
@@ -36,3 +33,5 @@ export class JwtAuthGuard implements CanActivate {
     }
   }
 }
+
+export default JwtAuthGuard

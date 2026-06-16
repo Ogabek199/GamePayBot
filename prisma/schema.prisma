@@ -51,8 +51,8 @@ model Deposit {
   adminNote String?
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
-  card      PaymentCard @relation(fields: [cardId], references: [id])
   user      User        @relation(fields: [userId], references: [id])
+  card      PaymentCard @relation(fields: [cardId], references: [id])
 }
 
 model Transaction {
@@ -105,9 +105,9 @@ model Order {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   adminNote       String?
-  package         Package  @relation(fields: [packageId], references: [id])
-  game            Game     @relation(fields: [gameId], references: [id])
   user            User     @relation(fields: [userId], references: [id])
+  game            Game     @relation(fields: [gameId], references: [id])
+  package         Package  @relation(fields: [packageId], references: [id])
 }
 
 model PaymentMethod {

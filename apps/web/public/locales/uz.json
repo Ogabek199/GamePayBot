@@ -55,7 +55,7 @@
     "deposit_amount": "To'lov summasini kiriting",
     "deposit_cards": "To'lov usulini tanlang",
     "loading_cards": "Karta turlari yuklanmoqda...",
-    "no_active_cards": "Faol to'lov kartalari topilmadi",
+    "no_active_cards": "Hozircha to'lov kartalari mavjud emas",
     "continue": "Davom etish",
     "proceed_payment": "To'lovga o'tish"
   },

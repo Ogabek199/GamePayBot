@@ -26,7 +26,7 @@ export default function DepositPage() {
             setCards(data);
             setSelectedMethod(data[0].id);
           } else {
-            setFetchError("Faol to'lov kartalari topilmadi");
+            setFetchError("Hozircha to'lov kartalari mavjud emas");
           }
         })
         .catch((err) => {
@@ -125,7 +125,7 @@ export default function DepositPage() {
               </div>
             ) : cards.length === 0 ? (
               <div className="text-center py-8 bg-danger/10 rounded-2xl border border-danger/20 p-4">
-                <p className="text-danger font-bold text-sm">Faol to'lov kartalari topilmadi</p>
+                <p className="text-danger font-bold text-sm">Hozircha to'lov kartalari mavjud emas</p>
               </div>
             ) : (
               cards.map((card) => {

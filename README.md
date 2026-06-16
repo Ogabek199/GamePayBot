@@ -1,6 +1,6 @@
-Gang Pay — Telegram WebApp (scaffold)
+GamePayBot — Telegram WebApp (scaffold)
 
-This repository contains frontend (Next.js) and backend (NestJS) scaffolding for the Gang Pay Telegram WebApp.
+This repository contains frontend (Next.js) and backend (NestJS) scaffolding for the GamePayBot Telegram WebApp.
 
 Start here:
 - backend/: NestJS API

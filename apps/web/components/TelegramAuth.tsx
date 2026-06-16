@@ -1,28 +1,32 @@
 'use client';
-
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAuthStore } from '../stores/useAuthStore';
 import { loginWithTelegram } from '../services/api';
 
 export default function TelegramAuth() {
-  const { setAuth, setAuthenticating, user, token } = useAuthStore();
+  const { setAuth, setAuthenticating, token, user } = useAuthStore();
+  // useRef — re-render bo'lsa ham bir marta ishlaydi
+  const initiated = useRef(false);
 
   useEffect(() => {
-    // Only run once, and only if not already authenticated
-    const hasRunBefore = sessionStorage.getItem('telegram_auth_attempted');
-    if (hasRunBefore || (token && user)) {
-      setAuthenticating(false);
-      return;
-    }
+    // Hydration kutish — persist store yuklanishi kerak
+    const run = async () => {
+      // Allaqachon ishlayapti — ikkinchi marta chaqirilmasin
+      if (initiated.current) return;
+      initiated.current = true;
 
-    const initTelegram = async () => {
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('AUTO_AUTH: Checking Telegram WebApp...');
+      // Telegram WebApp mavjudligini tekshir
+      if (typeof window === 'undefined') return;
+
+      // WebApp skripti yuklanishini kut (max 3 soniya)
+      let attempts = 0;
+      while (!window.Telegram?.WebApp && attempts < 30) {
+        await new Promise((r) => setTimeout(r, 100));
+        attempts++;
       }
-      sessionStorage.setItem('telegram_auth_attempted', 'true');
 
-      if (typeof window === 'undefined' || !window.Telegram?.WebApp) {
-        console.error('AUTO_AUTH: Telegram WebApp not detected.');
+      if (!window.Telegram?.WebApp) {
+        console.error('[TelegramAuth] WebApp SDK topilmadi');
         setAuthenticating(false);
         return;
       }
@@ -32,30 +36,40 @@ export default function TelegramAuth() {
       webapp.expand();
 
       const initData = webapp.initData;
+
       if (!initData) {
-        console.error('AUTO_AUTH: No initData available.');
+        console.error('[TelegramAuth] initData bo\'sh — bot orqali kiring');
         setAuthenticating(false);
         return;
       }
 
+      // Token va user allaqachon localStorage da saqlangan bo'lsa —
+      // initData ni yangilash uchun baribir re-auth qilamiz
+      // (token eskirgan bo'lishi mumkin)
+      setAuthenticating(true);
+
       try {
-        if (process.env.NODE_ENV !== 'production') {
-          console.log('AUTO_AUTH: Attempting automatic login with initData...');
+        console.log('[TelegramAuth] Login boshlandi...');
+        const result = await loginWithTelegram(initData);
+        setAuth(result.token, result.user);
+        console.log('[TelegramAuth] Muvaffaqiyatli:', result.user?.firstName);
+      } catch (err: any) {
+        console.error('[TelegramAuth] Login xatosi:', err?.response?.data || err?.message);
+
+        // Agar token va user localStorage da saqlangan bo'lsa — ishlataveramiz
+        // Faqat to'liq yo'q bo'lsa xato ko'rsat
+        if (token && user) {
+          console.warn('[TelegramAuth] Eski session dan foydalanilmoqda');
+          setAuthenticating(false);
+        } else {
+          setAuthenticating(false);
         }
-        const { token, user } = await loginWithTelegram(initData);
-        
-        if (process.env.NODE_ENV !== 'production') {
-          console.log('AUTO_AUTH: Success, updating store with user:', user);
-        }
-        setAuth(token, user);
-      } catch (error) {
-        console.error('AUTO_AUTH: Automatic login failed:', error);
-        setAuthenticating(false);
       }
     };
 
-    initTelegram();
-  }, []); // Empty dependency array - run only once
+    run();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return null;
 }

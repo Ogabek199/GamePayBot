@@ -15,12 +15,16 @@ export class DepositsService implements OnModuleInit {
   constructor(
     private prisma: PrismaService,
     private bot: BotService,
-  ) {}
+  ) {
+    console.log('DEBUG: DepositsService constructor called, registering handler...');
+    this.registerHandler();
+  }
 
   // Register the Telegram inline-button handler so admins can approve/reject
   // a deposit directly from the notification message.
-  onModuleInit() {
+  private registerHandler() {
     this.bot.registerDepositActionHandler(async (action, depositId) => {
+      console.log(`DEBUG: Handler executed for action: ${action}, id: ${depositId}`);
       if (action === 'approve') {
         const dep = await this.approve(depositId);
         return `✅ Deposit #${dep.id.slice(0, 8)} tasdiqlandi`;
@@ -28,6 +32,10 @@ export class DepositsService implements OnModuleInit {
       const dep = await this.reject(depositId, "To'lov topilmadi");
       return `❌ Deposit #${dep.id.slice(0, 8)} rad etildi`;
     });
+  }
+
+  onModuleInit() {
+    // Already registered in constructor
   }
 
   async create(userId: string, amount: number, cardId: string) {

@@ -3,7 +3,7 @@ import { DepositsService } from './deposits.service';
 import { DepositsController } from './deposits.controller';
 import { BotModule } from '../bot/bot.module';
 import { JwtService } from '../../common/jwt.service';
-import { JwtAuthGuard } from '../../common/guards/jwt.guard';
+import JwtAuthGuard from '../../common/guards/jwt.guard';
 
 @Module({
   imports: [BotModule],

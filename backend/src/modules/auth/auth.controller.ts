@@ -1,7 +1,7 @@
 import { Controller, Post, Body, Patch, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { TelegramAuthDto } from './dto/telegram-auth.dto';
-import { JwtAuthGuard } from '../../common/guards/jwt.guard';
+import JwtAuthGuard from '../../common/guards/jwt.guard';
 import { CurrentUser } from '../../common/decorators/user.decorator';
 import { ConfigService } from '@nestjs/config';
 
@@ -16,7 +16,6 @@ export class AuthController {
   async telegram(@Body() body: TelegramAuthDto) {
     const botToken = this.configService.get<string>('BOT_TOKEN');
     if (process.env.NODE_ENV !== 'production') {
-      console.log('DEBUG: Bot token from config:', botToken);
     }
     const result = await this.authService.telegramLogin(body.initData, botToken || '');
     return result;
@@ -30,6 +29,7 @@ export class AuthController {
 
   @Post('test-connection')
   async testConnection() {
+    require('fs').writeFileSync('debug.log', 'DEBUG: testConnection called\n', { flag: 'a' });
     return { status: 'ok', message: 'Backend is reachable' };
   }
 }

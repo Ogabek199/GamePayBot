@@ -97,7 +97,6 @@ function PaymentContent() {
             setAuth(newToken, user);
             currentToken = newToken;
             if (process.env.NODE_ENV !== 'production') {
-              console.log('DEBUG: Re-auth successful.');
             }
         } catch (err) {
             console.error('Re-auth failed:', err);
