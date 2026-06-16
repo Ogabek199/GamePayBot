@@ -9,8 +9,10 @@ export class JwtAuthGuard implements CanActivate {
     const req = context.switchToHttp().getRequest();
     const authHeader = req.headers['authorization'] || req.headers['Authorization'];
     
-    console.log('JWT_DEBUG: Incoming headers:', req.headers);
-    console.log('JWT_DEBUG: Authorization header:', authHeader);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('JWT_DEBUG: Incoming headers:', req.headers);
+      console.log('JWT_DEBUG: Authorization header:', authHeader);
+    }
 
     let token: string | undefined;
     if (authHeader && typeof authHeader === 'string' && authHeader.startsWith('Bearer ')) {
