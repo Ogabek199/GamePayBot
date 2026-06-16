@@ -83,7 +83,9 @@ function PaymentContent() {
 
     if (!currentToken) {
         setIsAuthenticating(true);
-        console.log('DEBUG: Token missing, attempting re-auth via Telegram...');
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('DEBUG: Token missing, attempting re-auth via Telegram...');
+        }
         const initData = window.Telegram?.WebApp?.initData;
         if (!initData) {
             setErrorMsg("Siz avtorizatsiyadan o'tmagansiz. Iltimos, Telegram orqali qaytadan kiring.");
@@ -94,7 +96,9 @@ function PaymentContent() {
             const { token: newToken, user } = await loginWithTelegram(initData);
             setAuth(newToken, user);
             currentToken = newToken;
-            console.log('DEBUG: Re-auth successful.');
+            if (process.env.NODE_ENV !== 'production') {
+              console.log('DEBUG: Re-auth successful.');
+            }
         } catch (err) {
             console.error('Re-auth failed:', err);
             setErrorMsg("Avtorizatsiyadan o'tishda xatolik yuz berdi. Iltimos, qaytadan urinib ko'ring.");
