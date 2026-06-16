@@ -59,7 +59,7 @@ function Home() {
   if (!user) {
     return (
         <div className="min-h-screen flex items-center justify-center p-4 text-center">
-          <p className="text-muted">Autentifikatsiya muvaffaqiyatsiz tugadi. Iltimos, qayta urinib ko'ring.</p>
+          <p className="text-muted">{t('auth.auth_failed')}</p>
         </div>
     );
   }

@@ -14,7 +14,9 @@
     "cancel": "Bekor qilish",
     "back": "Ortga",
     "next": "Davom etish",
-    "uzs": "UZS"
+    "uzs": "UZS",
+    "error": "Xatolik",
+    "success": "Muvaffaqiyatli"
   },
   "home": {
     "popular_games": "Mashhur o'yinlar",
@@ -23,6 +25,11 @@
     "auto_system": "Avtomatik tizim",
     "support_247": "24/7 Qo'llab",
     "always_online": "Doimiy aloqa"
+  },
+  "auth": {
+    "auth_failed": "Autentifikatsiya muvaffaqiyatsiz tugadi. Iltimos, qayta urinib ko'ring.",
+    "login_required": "Siz avtorizatsiyadan o'tmagansiz. Iltimos, Telegram orqali qaytadan kiring.",
+    "reauth_failed": "Avtorizatsiyadan o'tishda xatolik yuz berdi. Iltimos, qaytadan urinib ko'ring."
   },
   "profile": {
     "personal_info": "Shaxsiy ma'lumotlar",
@@ -43,7 +50,31 @@
     "recent_txs": "Oxirgi tranzaksiyalar",
     "enter_amount": "Summani kiriting",
     "select_method": "To'lov usulini tanlang",
-    "pay_confirm": "Men to'ladim"
+    "pay_confirm": "Men to'ladim",
+    "deposit_title": "Hisobni to'ldirish",
+    "deposit_amount": "To'lov summasini kiriting",
+    "deposit_cards": "To'lov usulini tanlang",
+    "loading_cards": "Karta turlari yuklanmoqda...",
+    "no_active_cards": "Faol to'lov kartalari topilmadi",
+    "continue": "Davom etish",
+    "proceed_payment": "To'lovga o'tish"
+  },
+  "payment": {
+    "title": "To'lov ma'lumotlari",
+    "amount": "To'lov summasi",
+    "card_info": "Karta ma'lumotlari",
+    "card_holder": "Karta egasi",
+    "card_number": "Karta raqami",
+    "bank_name": "Bank nomi",
+    "warning": "Muhim: Iltimos, aynan ko'rsatilgan summani yuboring. Aks holda to'lov tasdiqlanmasligi mumkin.",
+    "copy_button": "Nusxalash",
+    "copy_success": "nusxalandi",
+    "paid_button": "Men to'ladim",
+    "success": "To'lov so'rovi qabul qilindi. Admin tomonidan tekshirilmoqda.",
+    "card_not_found": "To'lov kartasi topilmadi",
+    "invalid_amount": "Summa noto'g'ri",
+    "duplicate_payment": "Sizda hali tasdiqlanmagan to'lov mavjud",
+    "timer": "Vaqti qolgan"
   },
   "games": {
     "official_partner": "Rasmiy hamkor",
