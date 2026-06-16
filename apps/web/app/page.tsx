@@ -20,12 +20,11 @@ import { fetchMyWallet, fetchMyDeposits } from '../services/api';
 function Home() {
   const {user, isAuthenticating} = useAuthStore();
   const {t} = useTranslation();
-  const [mounted, setMounted] = useState(false);
+  
   const [balance, setBalance] = useState<number>(0);
   const [todayTopup, setTodayTopup] = useState<number>(0);
 
   useEffect(() => {
-    setMounted(true);
     if (user) {
       Promise.all([
         fetchMyWallet().catch(() => ({ balance: 0 })),
@@ -45,8 +44,6 @@ function Home() {
       });
     }
   }, [user]);
-
-  if (!mounted) return null;
 
   if (isAuthenticating) {
     return (

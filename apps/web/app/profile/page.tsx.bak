@@ -14,9 +14,13 @@ export default function ProfilePage() {
   const router = useRouter();
   const [isLangOpen, setIsLangOpen] = useState(false);
   const [isSupportOpen, setIsSupportOpen] = useState(false);
-  React.useEffect(() => {
-    }, []);
+  const [mounted, setMounted] = useState(false);
 
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   const menuItems = [
     { icon: User, label: t('profile.personal_info'), onClick: () => router.push('/profile/personal') },

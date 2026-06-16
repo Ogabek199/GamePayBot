@@ -12,6 +12,7 @@ import { fetchMyWallet, fetchMyTransactions } from '../../services/api';
 export default function WalletPage() {
   const router = useRouter();
   const { t } = useTranslation();
+  const [mounted, setMounted] = useState(false);
   const [balance, setBalance] = useState<number>(0);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -20,6 +21,7 @@ export default function WalletPage() {
   const [isCardsOpen, setIsCardsOpen] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     Promise.all([
       fetchMyWallet().catch((err) => {
         console.error('Fetch wallet error:', err);
@@ -38,6 +40,7 @@ export default function WalletPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  if (!mounted) return null;
 
   return (
     <main className="min-h-screen animate-fade-in p-4 md:p-6 pb-32 md:pb-8 max-w-4xl mx-auto space-y-8">
